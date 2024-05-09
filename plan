@@ -1,0 +1,84 @@
+Plan d'action pour le développement
+
+Étape 1: Configuration de l'environnement de développement
+
+Installation des outils : Assurez-vous d'avoir un compilateur C++ qui supporte C++98, comme g++.
+Structure de base du projet : Créez un répertoire de projet avec des sous-répertoires pour les fichiers sources (src), les en-têtes (include), et les objets (build).
+
+Étape 2: Conception de l'architecture de base
+
+Définition des modules : Identifiez les principaux composants du serveur, tels que la gestion des connexions réseau, le traitement des commandes IRC, et la gestion des utilisateurs et des canaux.
+Création des fichiers :
+main.cpp : Le point d'entrée du programme.
+Server.cpp et Server.hpp : Gérer la logique du serveur, les sockets, et les connexions.
+Client.cpp et Client.hpp : Gérer les informations et interactions spécifiques aux clients.
+Channel.cpp et Channel.hpp : Gérer les opérations liées aux canaux.
+CommandHandler.cpp et CommandHandler.hpp : Interpréter et exécuter les commandes IRC.
+Utilities.cpp et Utilities.hpp : Fonctions utilitaires, comme la manipulation de chaînes et le logging.
+
+Étape 3: Implémentation des fonctionnalités de base
+
+Gestion des sockets : Écrivez le code pour créer, lier, et écouter les sockets.
+Connexion des clients : Implémentez la logique pour accepter les nouvelles connexions des clients.
+Réception et envoi de messages : Codez la réception des commandes des clients et l'envoi de réponses.
+
+Étape 4: Gestion des commandes et des canaux
+
+Traitement des commandes : Développez le traitement des commandes telles que JOIN, NICK, PRIVMSG.
+Gestion des canaux : Implémentez la logique pour créer, modifier, et gérer les canaux.
+
+Étape 5: Tests et débogage
+
+Tests unitaires : Écrivez des tests pour chaque composant.
+Tests d'intégration : Testez le fonctionnement global du serveur avec des clients IRC.
+Débogage : Corrigez les bugs identifiés lors des tests.
+
+Étape 6: Préparation pour les fonctionnalités bonus
+
+Architecture extensible : Assurez-vous que votre conception permet facilement l'ajout de nouvelles fonctionnalités, comme le transfert de fichiers ou un bot IRC.
+Documentation : Documentez les points d'extension pour les fonctionnalités bonus.
+
+Étape 7: Documentation et finalisation
+
+Documentation du code : Assurez-vous que chaque fonction et module est bien documenté.
+Nettoyage du code : Revoyez votre code pour vous assurer qu'il est propre et bien organisé.
+Intégration des fonctionnalités bonus
+Planification conditionnelle : Les fonctionnalités bonus ne doivent être abordées que si la partie obligatoire est parfaitement fonctionnelle et testée.
+Modularité : Gardez les modules bonus séparés et veillez à ce qu'ils ne perturbent pas le fonctionnement de base.
+
+Arborescence du pojet:
+
+irc_server/
+│
+├── src/
+│   ├── main.cpp               # Point d'entrée du programme.
+│   ├── Server.cpp             # Implémentation des fonctionnalités du serveur.
+│   ├── Client.cpp             # Gestion des clients.
+│   ├── Channel.cpp            # Gestion des canaux.
+│   ├── CommandHandler.cpp     # Traitement et exécution des commandes IRC.
+│   ├── Utilities.cpp          # Fonctions utilitaires.
+│   ├── FileTransfer.cpp       # Gestion du transfert de fichiers (bonus).
+│   └── Bot.cpp                # Logique du bot IRC (bonus).
+│
+├── include/
+│   ├── Server.hpp             # Déclarations pour la gestion du serveur.
+│   ├── Client.hpp             # Déclarations pour la gestion des clients.
+│   ├── Channel.hpp            # Déclarations pour la gestion des canaux.
+│   ├── CommandHandler.hpp     # Déclarations pour le traitement des commandes.
+│   ├── Utilities.hpp          # Déclarations pour les fonctions utilitaires.
+│   ├── FileTransfer.hpp       # Déclarations pour la gestion du transfert de fichiers (bonus).
+│   └── Bot.hpp                # Déclarations pour la logique du bot IRC (bonus).
+│
+├── build/
+│   └── (fichiers objets et binaires générés lors de la compilation)
+│
+├── tests/
+│   ├── server_tests.cpp       # Tests unitaires pour le serveur.
+│   ├── client_tests.cpp       # Tests pour les fonctionnalités client.
+│   ├── channel_tests.cpp      # Tests pour les canaux.
+│   ├── file_transfer_tests.cpp # Tests pour le transfert de fichiers (bonus).
+│   └── bot_tests.cpp          # Tests pour le bot IRC (bonus).
+│
+├── Makefile                   # Makefile pour compiler le projet.
+│
+└── README.md                  # Instructions de base et documentation.
