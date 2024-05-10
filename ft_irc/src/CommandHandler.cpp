@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/09 14:19:15 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/09 14:33:32 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/10 12:33:00 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,8 +62,10 @@ void CommandHandler::handleNick(const std::string& command, Client* client) {
     std::vector<std::string> tokens = split(command, ' ');
     if (tokens.size() > 1) {
         client->setNickname(tokens[1]);
+        std::cout << "Nickname set to: " << tokens[1] << std::endl; // Afficher et enregistrer l'action
     }
 }
+
 
 void CommandHandler::handlePrivmsg(const std::string& command, Client* client) {
     std::vector<std::string> tokens = split(command, ' ');

@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/09 14:01:12 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/09 14:39:02 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/10 14:10:44 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,6 @@
 
 #include <string>
 #include <vector>
-#include "Client.hpp"
-#include "CommandHandler.hpp"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
@@ -24,7 +22,21 @@
 #include <iostream>
 #include <stdexcept>
 #include <cerrno>
+#include <pthread.h>
 
+#include "Client.hpp"  // Assurez-vous que Client est inclus avant Server
+#include "CommandHandler.hpp"
+
+class Server;  // Déclaration anticipée de Server si nécessaire
+
+// Structure pour passer des données aux threads
+struct ClientContext {
+    Client* client;
+    Server* server;
+    CommandHandler* cmdHandler;
+
+    ClientContext(Client* c, Server* s, CommandHandler* ch) : client(c), server(s), cmdHandler(ch) {}
+};
 class Server {
 public:
     Server(int port, const std::string& password);
@@ -37,9 +49,11 @@ private:
     int port;                   // Port number to bind the server
     std::string password;       // Server password for client connections
     bool running;               // Server running status
-    std::vector<Client*> clients; // List of connected clients
+    std::vector<pthread_t> threads; // List of threads for client management
 
-    void manageClient(Client* client, CommandHandler& cmdHandler);
+    static void *manageClient(void *clientContext); // Static to be compatible with pthread
 };
 
 #endif // SERVER_HPP
+
+

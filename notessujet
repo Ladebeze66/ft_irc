@@ -317,3 +317,5 @@ Scalabilité : Pensez à la scalabilité de votre serveur avec ces nouvelles fon
 Conformité aux standards : Même pour les fonctionnalités bonus, tenez-vous aux standards IRC et aux bonnes pratiques de programmation pour garantir que votre serveur peut interagir correctement avec d'autres clients et serveurs IRC.
 
 Ces fonctionnalités bonus peuvent grandement enrichir l'expérience utilisateur sur votre serveur IRC, le rendant plus attractif et plus utile pour vos utilisateurs.
+
+Dans le cadre de notre projet nous utiliserons hexcat comme reference de client irc.
