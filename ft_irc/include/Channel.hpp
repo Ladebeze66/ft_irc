@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/09 14:07:50 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/09 14:33:01 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/11 16:20:58 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,9 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+
+class Client;
+
 
 class Channel {
 public:

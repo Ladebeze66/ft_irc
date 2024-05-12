@@ -6,54 +6,60 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/09 14:01:12 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/10 14:10:44 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/12 17:14:30 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
+#include <map>
+#include <cerrno>
+#include <cstdio>
 #include <string>
 #include <vector>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <unistd.h>
+#include <sstream>
 #include <cstring>
 #include <iostream>
-#include <stdexcept>
-#include <cerrno>
-#include <pthread.h>
+#include <unistd.h>
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <algorithm>
 
-#include "Client.hpp"  // Assurez-vous que Client est inclus avant Server
+#include "color.hpp"
+#include "Client.hpp"
 #include "CommandHandler.hpp"
 
-class Server;  // Déclaration anticipée de Server si nécessaire
+class Client;
+class CommandHandler;
 
-// Structure pour passer des données aux threads
-struct ClientContext {
-    Client* client;
-    Server* server;
-    CommandHandler* cmdHandler;
-
-    ClientContext(Client* c, Server* s, CommandHandler* ch) : client(c), server(s), cmdHandler(ch) {}
-};
-class Server {
+class Server
+{
 public:
-    Server(int port, const std::string& password);
-    ~Server();
-    bool initialize();
-    void run();
+	Server(int port, const std::string& password);
+	~Server();
+	void run();
+	bool initialize();
+	void closeClient(int sockfd);
 
 private:
-    int listener;               // Socket descriptor for the server
-    int port;                   // Port number to bind the server
-    std::string password;       // Server password for client connections
-    bool running;               // Server running status
-    std::vector<pthread_t> threads; // List of threads for client management
+	int port;     // Port d'écoute
+	std::string password; // Mot de passe pour les clients se connectant
 
-    static void *manageClient(void *clientContext); // Static to be compatible with pthread
+	bool running; // État d'exécution du serveur
+	int listener; // Socket d'écoute du serveur
+	int fdmax;
+	fd_set master_set; // Ensemble principal des descripteurs de fichiers pour select
+	std::map<int, Client*> clients; // Mapping de socket à Client
+	std::map<int, CommandHandler*> handlers; // CommandHandler pour chaque client
+
+	void acceptNewClient();
+	bool handleClientActivity(int sockfd);
+	bool getlineFromClient(Client* client, std::string& line);
+	void handleIRCMessages(Client* client, CommandHandler& cmdHandler);
+	bool processInitialCommands(Client* client);
 };
 
 #endif // SERVER_HPP
-
-

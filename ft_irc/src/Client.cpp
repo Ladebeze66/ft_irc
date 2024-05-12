@@ -6,13 +6,15 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/09 14:07:27 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/10 13:33:20 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/11 16:11:10 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
 #include <cstring>
 #include <sys/socket.h>
+
+Client::Client() {}
 
 Client::Client(int socket, const std::string& nickname, const std::string& username)
     : socket(socket), nickname(nickname), username(username) {}
@@ -57,3 +59,11 @@ int Client::getSocket() const {
     return socket;
 }
 
+void Client::setUsername(const std::string& newUsername) {
+    nickname = newUsername;
+}
+
+void Client::setRealname(const std::string& newRealname) {
+    // Assurez-vous d'avoir un membre `realname` dans Client
+    username = newRealname;
+}
