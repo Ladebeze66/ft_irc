@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/09 14:01:34 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/12 17:07:02 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/13 19:19:46 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,96 +79,99 @@ bool Server::initialize()
 	return true;
 }
 
-bool Server::getlineFromClient(Client* client, std::string& line)
-{
-	char buffer[1024];
-	memset(buffer, 0, sizeof(buffer));
-	int len = recv(client->getSocket(), buffer, sizeof(buffer) - 1, 0);
+bool Server::getlineFromClient(Client* client, std::string& line) {
+    char buffer[1024];
+    while (true) {
+        memset(buffer, 0, sizeof(buffer));
+        int len = recv(client->getSocket(), buffer, sizeof(buffer) - 1, 0);
 
-	if (len > 0)
-	{
-		buffer[len] = '\0'; // Ensure null termination
-		line = std::string(buffer);
-		line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
-		line.erase(std::remove(line.begin(), line.end(), '\n'), line.end());
-		return true;
-	}
-	else if (len == 0)
-	{
-		std::cout << RED << "Client disconnected." << RESET << std::endl;
-		return false; // Connection is closed
-	}
-	else
-	{
-		std::cerr << RED << "Error reading from client socket: " << strerror(errno) << RESET << std::endl;
-		return false; // An error occurred
-	}
+        if (len > 0) {
+            buffer[len] = '\0';
+            line = std::string(buffer);
+            line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
+            line.erase(std::remove(line.begin(), line.end(), '\n'), line.end());
+            std::cout << GREEN << "Received line: " << line << RESET << std::endl;
+            return true;
+        } else if (len == 0) {
+            std::cout << RED << "Client disconnected." << RESET << std::endl;
+            return false;
+        } else {
+            if (errno == EWOULDBLOCK || errno == EAGAIN) {
+                // Si non-bloquant et aucune donnée n'est disponible, attendez un peu et réessayez
+                std::cout << YELLOW << "No data available yet, non-blocking mode." << RESET << std::endl;
+                usleep(100000); // attendre 100 ms
+                continue; // Continuez à essayer de lire
+            } else {
+                std::cerr << RED << "Error reading from client socket: " << strerror(errno) << RESET << std::endl;
+                return false;
+            }
+        }
+    }
 }
 
-bool Server::processInitialCommands(Client* client)
-{
-	std::string line;
-	bool isAuthenticated = false;  // Pour garder une trace de l'authentification
 
-	while (getlineFromClient(client, line) && !line.empty())
-	{
-		std::cout << MAGENTA << "Processing line: " << RESET << line << std::endl;
-		// Extraction et traitement de la commande PASS
-		size_t passEnd = line.find("NICK");
-		if (passEnd != std::string::npos)
-		{
-			std::string passCommand = line.substr(0, passEnd);
-			std::istringstream passIss(passCommand);
-			std::string passToken, extractedPassword;
-			passIss >> passToken >> extractedPassword;
-			if (extractedPassword != this->password)
-			{
-				client->sendMessage("ERROR :Wrong password\r\n");
-				std::cout << RED << "Authentication failed for password: " << RESET << extractedPassword << std::endl;
-				return false;
-			}
-			else
-			{
-				std::cout << "CLIENT Socket: " << client->getSocket() << GREEN << " :Authentication successful." << RESET << std::endl;
-				isAuthenticated = true;
-			}
-		}
 
-		// Traitement des commandes NICK et USER
-		if (isAuthenticated)
-		{  // Seulement si authentifié
-			size_t nickEnd = line.find("USER");
-			if (nickEnd != std::string::npos)
-			{
-				std::string nickCommand = line.substr(passEnd, nickEnd - passEnd);
-				std::istringstream nickIss(nickCommand);
-				std::string nickToken, nickname;
-				nickIss >> nickToken >> nickname;
-				client->setNickname(nickname);
-				std::cout << BLUE << "NickName SET: " << RESET << nickname << std::endl;
-				std::string userCommand = line.substr(nickEnd);
-				std::istringstream userIss(userCommand);
-				std::string userToken, username, realname;
-				userIss >> userToken >> username;
-				size_t realnameStart = userCommand.find(":");
-				if (realnameStart != std::string::npos)
-				{
-					realname = userCommand.substr(realnameStart + 1);
-					client->setUsername(username);
-					client->setRealname(realname);
-					std::cout << GREEN << "CLIENT: " << "SET NickName: " << nickname << "; UserName: " << username << "; Socket: " << client->getSocket() << RESET << std::endl;
-					break;
-				}
-			}
-		}
-	}
-	// Après une authentification réussie, passez à la gestion des messages IRC
-	if (isAuthenticated)
-	{
-		handleIRCMessages(client, *new CommandHandler()); // Attention à la gestion de la mémoire ici
-	}
-	return isAuthenticated;
+
+bool Server::processInitialCommands(Client* client) {
+    std::string line;
+    bool isAuthenticated = false;
+
+    if (!getlineFromClient(client, line) || line.empty()) {
+        std::cout << RED << "No initial commands received or connection lost." << RESET << std::endl;
+        return false;
+    }
+
+    std::cout << MAGENTA << "Processing initial line: " << RESET << line << std::endl;
+
+    // Extrait les parties nécessaires de la ligne
+    size_t passIndex = line.find("PASS");
+    size_t nickIndex = line.find("NICK");
+    size_t userIndex = line.find("USER");
+
+    if (passIndex == std::string::npos || nickIndex == std::string::npos || userIndex == std::string::npos) {
+        std::cerr << "Command format error." << std::endl;
+        return false;
+    }
+
+    // Extraction des données
+    std::string password = line.substr(passIndex + 4, nickIndex - (passIndex + 4));
+    std::string nickname = line.substr(nickIndex + 4, userIndex - (nickIndex + 4));
+    std::string userAndRealName = line.substr(userIndex + 4);  // Contient le username et le realname
+    size_t spaceIndex = userAndRealName.find(' ');
+    std::string username = userAndRealName.substr(0, spaceIndex);
+    std::string realname = userAndRealName.substr(spaceIndex + 1);
+
+    // Retire les espaces potentiels autour des informations
+    password.erase(remove(password.begin(), password.end(), ' '), password.end());
+    nickname.erase(remove(nickname.begin(), nickname.end(), ' '), nickname.end());
+    username.erase(remove(username.begin(), username.end(), ' '), username.end());
+
+    // Validation du mot de passe
+    if (password != this->password) {
+        client->sendMessage("ERROR :Wrong password\r\n");
+        std::cout << RED << "Authentication failed for password: " << password << RESET << std::endl;
+        return false;
+    }
+
+    // Set up client details if password is correct
+    client->setNickname(nickname);
+    client->setUsername(username);
+    client->setRealname(realname);
+    isAuthenticated = true;
+
+    std::cout << GREEN << "Authentication successful, client setup complete." << RESET << std::endl;
+    std::cout << GREEN << "Client details - Nickname: " << nickname << ", Username: " << username << ", Realname: " << realname << RESET << std::endl;
+
+    // Proceed to handle IRC messages if authenticated
+    if (isAuthenticated) {
+        handleIRCMessages(client, *new CommandHandler());
+    }
+    return isAuthenticated;
 }
+
+
+
+
 // Handle IRC commands
 void Server::handleIRCMessages(Client* client, CommandHandler& cmdHandler)
 {
@@ -243,52 +246,74 @@ void Server::run()
 	}
 }
 
-void Server::acceptNewClient()
-{
-	struct sockaddr_in client_addr;
-	socklen_t addrlen = sizeof(client_addr);
-	std::cout << CYAN << "Ready to accept new connection..." << RESET << std::endl;
-	int newfd = accept(listener, (struct sockaddr *)&client_addr, &addrlen);
+void Server::acceptNewClient() {
+    struct sockaddr_in client_addr;
+    socklen_t addrlen = sizeof(client_addr);
+    std::cout << CYAN << "Prêt à accepter une nouvelle connexion..." << RESET << std::endl;
+    int newfd = accept(listener, (struct sockaddr *)&client_addr, &addrlen);
 
-	if (newfd == -1)
-	{
-		perror("Accept failed");
-		return;
-	}
+    if (newfd == -1) {
+        perror("Échec de l'acceptation");
+        return;
+    }
 
-	clients[newfd] = new Client(newfd);
-	FD_SET(newfd, &master_set);
-	if (newfd > fdmax)
-	{
-		fdmax = newfd;
-	}
+    int flags = fcntl(newfd, F_GETFL, 0);
+    if (flags == -1) flags = 0;
+    fcntl(newfd, F_SETFL, flags | O_NONBLOCK);
 
-	std::cout << GREEN << "Accepted new client: " << inet_ntoa(client_addr.sin_addr) << " on fd: " << newfd << RESET << std::endl;
+    Client* newClient = new Client(newfd);
+    if (!newClient) {
+        std::cerr << RED << "Échec de la création d'une nouvelle instance Client." << RESET << std::endl;
+        close(newfd);
+        return;
+    }
+
+    CommandHandler* newHandler = new CommandHandler();
+    if (!newHandler) {
+        std::cerr << RED << "Échec de la création d'une nouvelle instance de CommandHandler." << RESET << std::endl;
+        delete newClient;
+        close(newfd);
+        return;
+    }
+
+    clients[newfd] = newClient;
+    handlers[newfd] = newHandler;
+    FD_SET(newfd, &master_set);
+    if (newfd > fdmax) {
+        fdmax = newfd;
+    }
+
+    std::cout << GREEN << "Nouveau client accepté: " << inet_ntoa(client_addr.sin_addr) << " sur fd: " << newfd << RESET << std::endl;
+
+    if (!processInitialCommands(newClient)) {
+        std::cerr << "Échec du traitement des commandes initiales, fermeture de la connexion." << std::endl;
+        closeClient(newfd);
+    }
 }
 
-bool Server::handleClientActivity(int sockfd)
-{
-	Client* client = clients[sockfd];
-	if (!client)
-	{
-		std::cerr << RED << "Client not found for socket " << RESET << sockfd << std::endl;
-		return false;
-	}
 
-	std::string line;
-	if (getlineFromClient(client, line) && !line.empty())
-	{
-		std::cout << GREEN << "Received message: [" << line << "]" << RESET << std::endl;
-		CommandHandler* cmdHandler = handlers[sockfd];
-		cmdHandler->handleCommand(line, client);
-		return true;
-	}
-	else
-	{
-		std::cerr << RED << "Client disconnected or error on socket: " << RESET << sockfd << std::endl;
-		return false;
-	}
+
+
+bool Server::handleClientActivity(int sockfd) {
+    Client* client = clients[sockfd];
+    CommandHandler* cmdHandler = handlers[sockfd];  // Assurez-vous que cmdHandler est récupéré correctement
+
+    if (!client || !cmdHandler) {
+        std::cerr << RED << "Client or CommandHandler not found for socket " << RESET << sockfd << std::endl;
+        return false;
+    }
+
+    std::string line;
+    if (getlineFromClient(client, line) && !line.empty()) {
+        std::cout << GREEN << "Received message: [" << line << "]" << RESET << std::endl;
+        cmdHandler->handleCommand(line, client);
+        return true;
+    } else {
+        std::cerr << RED << "Client disconnected or error on socket: " << RESET << sockfd << std::endl;
+        return false;
+    }
 }
+
 
 void Server::closeClient(int sockfd)
 {

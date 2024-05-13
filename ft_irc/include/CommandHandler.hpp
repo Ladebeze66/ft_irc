@@ -6,20 +6,26 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/09 14:19:30 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/12 17:09:20 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/12 17:48:14 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef COMMANDHANDLER_HPP
 #define COMMANDHANDLER_HPP
 
-#include "Client.hpp"
-#include "Channel.hpp"
-#include "Utilities.hpp"
+#include <iostream>
+#include <sstream>
+#include <algorithm>
+#include <iterator>
 #include <map>
 #include <string>
 #include <sstream>
 #include <iterator>
+
+#include "Client.hpp"
+#include "Channel.hpp"
+#include "Utilities.hpp"
+
 
 class Client;
 class Channel;

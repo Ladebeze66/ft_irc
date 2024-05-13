@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/09 14:01:12 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/12 17:14:30 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/13 19:00:18 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,9 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <algorithm>
+#include <fcntl.h>  // Include this for fcntl and O_NONBLOCK
+#include <sys/epoll.h>
+
 
 #include "color.hpp"
 #include "Client.hpp"
@@ -51,6 +54,8 @@ private:
 	bool running; // État d'exécution du serveur
 	int listener; // Socket d'écoute du serveur
 	int fdmax;
+	int epoll_fd; // Descripteur pour l'instance epoll
+	static const int MAX_EVENTS = 10; // Nombre maximal d'événements traités à chaque appel à epoll_wait
 	fd_set master_set; // Ensemble principal des descripteurs de fichiers pour select
 	std::map<int, Client*> clients; // Mapping de socket à Client
 	std::map<int, CommandHandler*> handlers; // CommandHandler pour chaque client
@@ -60,6 +65,8 @@ private:
 	bool getlineFromClient(Client* client, std::string& line);
 	void handleIRCMessages(Client* client, CommandHandler& cmdHandler);
 	bool processInitialCommands(Client* client);
+	void handleNickAndUserCommands(const std::string& line, size_t passEnd, Client* client);
+	void setNonBlocking(int sockfd);
 };
 
 #endif // SERVER_HPP

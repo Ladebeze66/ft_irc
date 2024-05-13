@@ -6,7 +6,7 @@
 #    By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/09 13:54:36 by fgras-ca          #+#    #+#              #
-#    Updated: 2024/05/09 13:54:48 by fgras-ca         ###   ########.fr        #
+#    Updated: 2024/05/12 18:19:36 by fgras-ca         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -36,7 +36,7 @@ $(NAME): $(OBJECTS)
 # Compilation des fichiers source en fichiers objet
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(OBJ_DIR)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -g -c $< -o $@
 
 # Commande pour nettoyer le projet (supprimer les fichiers objet et l'exécutable)
 clean:

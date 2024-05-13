@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/09 14:07:27 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/11 16:11:10 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/13 16:59:32 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,15 +33,16 @@ std::string Client::receiveMessage() {
     std::memset(buffer, 0, sizeof(buffer));
     int len = recv(socket, buffer, sizeof(buffer) - 1, 0);
     if (len > 0) {
-        buffer[len] = '\0'; // Ensure null termination
+        buffer[len] = '\0';
         std::string received(buffer);
-        // Erase newline and carriage return characters
-        size_t pos;
-        while ((pos = received.find_first_of("\r\n")) != std::string::npos) {
-            received.erase(pos, 1);
-        }
+        received.erase(std::remove(received.begin(), received.end(), '\r'), received.end());
+        received.erase(std::remove(received.begin(), received.end(), '\n'), received.end());
         std::cout << "Received message: [" << received << "]" << std::endl;
         return received;
+    } else if (len == 0) {
+        std::cout << "Connection closed by the peer." << std::endl;
+    } else {
+        std::cerr << "recv error: " << strerror(errno) << std::endl;
     }
     return "";
 }
