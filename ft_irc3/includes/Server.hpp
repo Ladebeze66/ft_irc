@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:15:13 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/16 17:40:34 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/17 20:03:06 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,9 @@ public:
     std::map<std::string, Channel *> &getChannels();
     std::map<int, Client *> &getClients();
 	const std::string &getPassword() const;
+	void broadcast(const std::string &message);
+    Client* getClientByName(const std::string &name); // Ajoutez cette méthode
+	void sendChannelListToClient(Client *client);
 
 
 protected:

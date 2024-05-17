@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/16 15:27:29 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/16 16:41:53 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/17 20:15:14 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,19 +64,21 @@ void handleNickCommand(Server *server, Client *client, const std::string &comman
     server->log(ss.str(), GREEN);
 }
 
-// Fonction pour gérer la commande PRIVMSG
 void handlePrivmsgCommand(Server *server, Client *client, const std::string &command)
 {
     std::istringstream iss(command);
     std::string cmd, target, message;
     iss >> cmd >> target;
     getline(iss, message);
+
+    // Enlever le ':' initial dans le message si présent
     if (!message.empty() && message[0] == ':')
         message = message.substr(1);
 
+    // Récupérer les canaux du serveur
     std::map<std::string, Channel *> &channels = server->getChannels();
-    std::map<int, Client *> &clients = server->getClients();
 
+    // Si la cible est un canal
     if (channels.find(target) != channels.end())
     {
         Channel *channel = channels[target];
@@ -84,6 +86,7 @@ void handlePrivmsgCommand(Server *server, Client *client, const std::string &com
 
         for (size_t i = 0; i < channelClients.size(); ++i)
         {
+            // Envoyer le message à tous les clients du canal sauf l'émetteur
             if (channelClients[i] != client)
             {
                 std::stringstream privMsg;
@@ -92,17 +95,23 @@ void handlePrivmsgCommand(Server *server, Client *client, const std::string &com
             }
         }
     }
-    else if (clients.find(atoi(target.c_str())) != clients.end())
-    {
-        Client *targetClient = clients[atoi(target.c_str())];
-        std::stringstream privMsg;
-        privMsg << ":" << client->getNickname() << " PRIVMSG " << target << " :" << message << "\r\n";
-        server->sendToClient(targetClient->getFd(), privMsg.str());
-    }
+    // Si la cible est un utilisateur
     else
     {
-        std::stringstream ss;
-        ss << ":server 401 " << client->getNickname() << " " << target << " :No such nick/channel\r\n";
-        server->sendToClient(client->getFd(), ss.str());
+        Client *targetClient = server->getClientByName(target); // Utiliser getClientByName pour trouver le client par nom
+
+        if (targetClient)
+        {
+            std::stringstream privMsg;
+            privMsg << ":" << client->getNickname() << " PRIVMSG " << target << " :" << message << "\r\n";
+            server->sendToClient(targetClient->getFd(), privMsg.str());
+        }
+        else
+        {
+            // Si la cible n'est ni un canal ni un utilisateur existant, envoyer un message d'erreur
+            std::stringstream errorMsg;
+            errorMsg << ":server 401 " << client->getNickname() << " " << target << " :No such nick/channel\r\n";
+            server->sendToClient(client->getFd(), errorMsg.str());
+        }
     }
 }

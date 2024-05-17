@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 18:32:23 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/16 16:25:50 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/17 18:53:09 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,11 @@ void ClientManager::acceptClient()
     int client_fd = accept(_server->_server_fd, NULL, NULL);
     if (client_fd < 0)
     {
-        _server->log("Accept failed.", RED);
+        _server->log("Failed to accept client.", RED);
         return;
     }
-    fcntl(client_fd, F_SETFL, O_NONBLOCK);
-    _server->_clients[client_fd] = new Client(client_fd);
+
+    _server->_clients[client_fd] = new Client(client_fd, "", "");  // Initialize with default values
     struct pollfd client_pollfd;
     client_pollfd.fd = client_fd;
     client_pollfd.events = POLLIN;
@@ -35,7 +35,16 @@ void ClientManager::acceptClient()
     std::stringstream ss;
     ss << "Client connected: " << client_fd;
     _server->log(ss.str(), GREEN);
-    _server->sendToClient(client_fd, ":server NOTICE * :Connected to the server\r\n");  // Debug message
+}
+
+void ClientManager::broadcastChannelList(Client *client) {
+    std::map<std::string, Channel *> &channels = _server->getChannels();
+    for (std::map<std::string, Channel *>::iterator it = channels.begin(); it != channels.end(); ++it) {
+        std::stringstream channelMsg;
+        channelMsg << ":server 322 " << client->getNickname() << " " << it->first << " :Existing channel\r\n";
+        _server->sendToClient(client->getFd(), channelMsg.str());
+    }
+    _server->sendToClient(client->getFd(), ":server 323 " + client->getNickname() + " :End of /LIST\r\n");
 }
 
 void ClientManager::handleClient(int client_fd)
@@ -65,6 +74,7 @@ void ClientManager::handleClient(int client_fd)
         line.erase(std::remove(line.begin(), line.end(), '\n'), line.end());
 
         _server->_commandHandler->handleCommand(client, line);
+		broadcastChannelList(_server->_clients[client_fd]);
     }
 }
 

@@ -6,71 +6,82 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:17:42 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/16 18:18:19 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/17 17:20:02 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
 
-Client::Client(int fd)
-	: _fd(fd), _authenticated(false)
+Client::Client(int fd, const std::string &nickname, const std::string &user)
+    : _fd(fd), _nickname(nickname), _user(user), _authenticated(false), _operator(false)
 {
-}
-
-void Client::setPassword(const std::string &password)
-{
-	_password = password;
-}
-
-const std::string &Client::getPassword() const
-{
-	return _password;
-}
-
-void Client::setNickname(const std::string &nickname)
-{
-	_nickname = nickname;
-}
-
-const std::string &Client::getNickname() const
-{
-	return _nickname;
-}
-
-void Client::setUser(const std::string &user)
-{
-	_user = user;
-}
-
-const std::string &Client::getUser() const
-{
-	return _user;
-}
-
-void Client::setRealName(const std::string &realname)
-{
-	_realname = realname;
-}
-
-const std::string &Client::getRealName() const
-{
-	return _realname;
-}
-
-bool Client::isAuthenticated() const
-{
-	return _authenticated;
-}
-
-void Client::authenticate()
-{
-	_authenticated = true;
 }
 
 int Client::getFd() const
 {
-	return _fd;
+    return _fd;
 }
+
+const std::string &Client::getNickname() const
+{
+    return _nickname;
+}
+
+void Client::setNickname(const std::string &nickname)
+{
+    _nickname = nickname;
+}
+
+const std::string &Client::getUser() const
+{
+    return _user;
+}
+
+void Client::setUser(const std::string &user)
+{
+    _user = user;
+}
+
+const std::string &Client::getPassword() const
+{
+    return _password;
+}
+
+void Client::setPassword(const std::string &password)
+{
+    _password = password;
+}
+
+const std::string &Client::getRealName() const
+{
+    return _realname;
+}
+
+void Client::setRealName(const std::string &realname)
+{
+    _realname = realname;
+}
+
+bool Client::isAuthenticated() const
+{
+    return _authenticated;
+}
+
+void Client::authenticate()
+{
+    _authenticated = true;
+}
+
+bool Client::isOperator() const
+{
+    return _operator;
+}
+
+void Client::setOperator(bool isOperator)
+{
+    _operator = isOperator;
+}
+
 
 
 

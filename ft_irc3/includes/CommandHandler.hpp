@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 18:14:12 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/16 17:35:46 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/17 17:10:38 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,15 @@
 #include "Client.hpp"
 #include "Channel.hpp"
 #include "AdditionalCommands.hpp"
+#include "ModeWhoHandler.hpp"
+#include "CommandHandler.hpp"
 
 #include <string>
 #include <sstream>
 #include <algorithm>
 
 class Server;
+class ModeWhoHandler;
 
 class CommandHandler
 {

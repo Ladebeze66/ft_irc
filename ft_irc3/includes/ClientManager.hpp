@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 18:30:07 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/16 16:26:03 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/17 18:51:44 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,10 @@ class ClientManager
 public:
     ClientManager(Server *server);
     void acceptClient();
+	void broadcastChannelList(Client *client);
     void handleClient(int client_fd);
     void removeClient(int client_fd);
+
 
 private:
     Server *_server;

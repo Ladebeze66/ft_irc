@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 18:26:34 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/16 19:34:36 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/17 20:05:16 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,14 +27,16 @@ void CommandHandler::handleCommand(Client *client, const std::string &command)
     }
 
     std::string commandType = tokens[0];
-
-    if (commandType == "PASS")
+	if (commandType == "CAP")
+	{}
+    else if (commandType == "PASS")
     {
         if (tokens.size() > 1 && tokens[1] == _server->_password)
         {
             client->setPassword(tokens[1]);
-            _server->sendToClient(client->getFd(), ":server 001 " + client->getNickname() + " :Password accepted\r\n");
+            _server->sendToClient(client->getFd(), ":server 001 " + client->getNickname() + " :Password accepted!\r\n");
             _server->log("Client " + client->getNickname() + " provided correct password.", GREEN);
+			_server->sendChannelListToClient(client);
         }
         else
         {
@@ -62,8 +64,12 @@ void CommandHandler::handleCommand(Client *client, const std::string &command)
             if (client->getPassword() == _server->_password && !client->getNickname().empty())
             {
                 client->authenticate();
-                _server->sendToClient(client->getFd(), ":server 001 " + client->getNickname() + " :Welcome to the IRC server\r\n");
+                std::stringstream welcomeMsg;
+				welcomeMsg << ":server 001 " << client->getNickname() << " :Welcome to the IRC server!\r\n";
+				_server->sendToClient(client->getFd(), welcomeMsg.str());
+
                 _server->log("Client " + client->getNickname() + " authenticated.", GREEN);
+				_server->sendChannelListToClient(client);
             }
         }
     }
@@ -101,6 +107,16 @@ void CommandHandler::processCommand(Client *client, const std::string &command)
     {
         handlePrivmsgCommand(_server, client, command);
     }
+    else if (command.find("MODE") == 0)
+    {
+        ModeWhoHandler modeHandler(_server);
+        modeHandler.handleModeCommand(client, command);
+    }
+    else if (command.find("WHO") == 0)
+    {
+        ModeWhoHandler whoHandler(_server);
+        whoHandler.handleWhoCommand(client, command);
+    }
     else
     {
         std::stringstream ss;
@@ -116,6 +132,9 @@ void CommandHandler::handleJoinCommand(Client *client, const std::string &channe
     {
         _server->getChannels()[channelName] = new Channel(channelName);
         _server->log("Channel created: " + channelName, GREEN);
+
+        // Notifier tous les clients de la création du canal
+        _server->broadcast(":server NOTICE * :New channel created: " + channelName + "\r\n");
     }
     Channel *channel = _server->getChannels()[channelName];
     channel->addClient(client);
@@ -135,6 +154,9 @@ void CommandHandler::handleJoinCommand(Client *client, const std::string &channe
     ss << "Client " << client->getNickname() << " joined channel " << channelName;
     _server->log(ss.str(), MAGENTA);
 }
+
+
+
 
 std::string CommandHandler::getUsersList(Channel *channel)
 {

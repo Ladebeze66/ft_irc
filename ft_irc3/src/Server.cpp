@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:17:12 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/16 18:52:19 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/17 20:03:44 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,8 +144,9 @@ void Server::handleServerCommands()
 
 void Server::log(const std::string &message, const std::string &color)
 {
-    std::cout << color << message << RESET << std::endl;
+    std::cout << color << message << "\033[0m" << std::endl;
 }
+
 
 void Server::sendToClient(int client_fd, const std::string &message)
 {
@@ -164,10 +165,17 @@ void Server::sendToClient(int client_fd, const std::string &message)
     }
 }
 
-
-std::map<int, Client *> &Server::getClients()
+const std::string &Server::getPassword() const
 {
-    return _clients;
+    return _password;
+}
+
+void Server::broadcast(const std::string &message)
+{
+    for (std::map<int, Client *>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+    {
+        sendToClient(it->first, message);
+    }
 }
 
 std::map<std::string, Channel *> &Server::getChannels()
@@ -175,10 +183,37 @@ std::map<std::string, Channel *> &Server::getChannels()
     return _channels;
 }
 
-const std::string &Server::getPassword() const
+std::map<int, Client *> &Server::getClients()
 {
-    return _password;
+    return _clients;
 }
+
+Client* Server::getClientByName(const std::string &name)
+{
+    for (std::map<int, Client *>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+    {
+        if (it->second->getNickname() == name)
+        {
+            return it->second;
+        }
+    }
+    return NULL; // Remplacez nullptr par NULL
+}
+
+void Server::sendChannelListToClient(Client *client)
+{
+    std::map<std::string, Channel *> &channels = getChannels();
+    for (std::map<std::string, Channel *>::iterator it = channels.begin(); it != channels.end(); ++it)
+    {
+        std::stringstream channelMsg;
+        channelMsg << ":server 322 " << client->getNickname() << " " << it->first << " :" << it->second->getClients().size() << "\r\n";
+        sendToClient(client->getFd(), channelMsg.str());
+    }
+    std::stringstream endOfListMsg;
+    endOfListMsg << ":server 323 " << client->getNickname() << " :End of /LIST\r\n";
+    sendToClient(client->getFd(), endOfListMsg.str());
+}
+
 
 
 /* Explications des Fonctions

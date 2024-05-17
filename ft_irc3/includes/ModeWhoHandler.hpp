@@ -1,27 +1,34 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utilities.cpp                                      :+:      :+:    :+:   */
+/*   ModeWhoHandler.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/05/09 14:23:12 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/11 13:35:49 by fgras-ca         ###   ########.fr       */
+/*   Created: 2024/05/17 16:08:48 by fgras-ca          #+#    #+#             */
+/*   Updated: 2024/05/17 18:08:06 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Utilities.hpp"
+#ifndef MODEWHOHANDLER_HPP
+#define MODEWHOHANDLER_HPP
 
-namespace Utilities {
+#include "Server.hpp"
+#include "Client.hpp"
+#include "Channel.hpp"
+#include "Utils.hpp"
 
-std::vector<std::string> split(const std::string& str, char delimiter) {
-    std::vector<std::string> tokens;
-    std::stringstream ss(str);
-    std::string token;
-    while (getline(ss, token, delimiter)) {
-        tokens.push_back(token);
-    }
-    return tokens;
-}
+class Server;
 
-}
+class ModeWhoHandler
+{
+public:
+    ModeWhoHandler(Server *server);
+    void handleModeCommand(Client *client, const std::string &command);
+    void handleWhoCommand(Client *client, const std::string &command);
+
+private:
+    Server *_server;
+};
+
+#endif
