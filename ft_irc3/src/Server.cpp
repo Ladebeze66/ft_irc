@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:17:12 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/17 20:03:44 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/19 19:21:54 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,13 @@ void Server::run()
     server_pollfd.revents = 0;
     _poll_fds.push_back(server_pollfd);
 
+    // Ajout de l'entrée pour les commandes serveur
+    struct pollfd stdin_pollfd;
+    stdin_pollfd.fd = STDIN_FILENO;
+    stdin_pollfd.events = POLLIN;
+    stdin_pollfd.revents = 0;
+    _poll_fds.push_back(stdin_pollfd);
+
     while (true)
     {
         int poll_count = poll(&_poll_fds[0], _poll_fds.size(), -1);
@@ -89,56 +96,58 @@ void Server::run()
                 {
                     _clientManager->acceptClient();
                 }
+                else if (_poll_fds[i].fd == STDIN_FILENO)
+                {
+                    handleServerCommands();
+                }
                 else
                 {
                     _clientManager->handleClient(_poll_fds[i].fd);
                 }
             }
         }
-
-        handleServerCommands();
     }
+}
+
+std::map<std::string, Channel *> &Server::getChannels()
+{
+    return _channels;
+}
+
+const std::string &Server::getPassword() const
+{
+    return _password;
 }
 
 void Server::handleServerCommands()
 {
-    fd_set readfds;
-    FD_ZERO(&readfds);
-    FD_SET(STDIN_FILENO, &readfds);
-    struct timeval tv = {0, 0};  // non-blocking
+    std::string command;
+    std::getline(std::cin, command);
 
-    int activity = select(STDIN_FILENO + 1, &readfds, NULL, NULL, &tv);
-
-    if (activity > 0 && FD_ISSET(STDIN_FILENO, &readfds))
+    if (command == "quit")
     {
-        std::string command;
-        std::getline(std::cin, command);
-
-        if (command == "quit")
+        log("Server shutting down.", YELLOW);
+        exit(EXIT_SUCCESS);
+    }
+    else if (command == "channels")
+    {
+        log("Listing all channels:", BLUE);
+        for (std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it)
         {
-            log("Server shutting down.", YELLOW);
-            exit(EXIT_SUCCESS);
+            log(it->first, BLUE);
         }
-        else if (command == "channels")
+    }
+    else if (command == "clients")
+    {
+        log("Listing all clients:", BLUE);
+        for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
         {
-            log("Listing all channels:", BLUE);
-            for (std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it)
-            {
-                log(it->first, BLUE);
-            }
+            log(it->second->getNickname(), BLUE);
         }
-        else if (command == "clients")
-        {
-            log("Listing all clients:", BLUE);
-            for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
-            {
-                log(it->second->getNickname(), BLUE);
-            }
-        }
-        else
-        {
-            log("Unknown server command.", RED);
-        }
+    }
+    else
+    {
+        log("Unknown server command.", RED);
     }
 }
 
@@ -146,7 +155,6 @@ void Server::log(const std::string &message, const std::string &color)
 {
     std::cout << color << message << "\033[0m" << std::endl;
 }
-
 
 void Server::sendToClient(int client_fd, const std::string &message)
 {
@@ -165,27 +173,12 @@ void Server::sendToClient(int client_fd, const std::string &message)
     }
 }
 
-const std::string &Server::getPassword() const
-{
-    return _password;
-}
-
 void Server::broadcast(const std::string &message)
 {
     for (std::map<int, Client *>::iterator it = _clients.begin(); it != _clients.end(); ++it)
     {
         sendToClient(it->first, message);
     }
-}
-
-std::map<std::string, Channel *> &Server::getChannels()
-{
-    return _channels;
-}
-
-std::map<int, Client *> &Server::getClients()
-{
-    return _clients;
 }
 
 Client* Server::getClientByName(const std::string &name)
@@ -205,16 +198,10 @@ void Server::sendChannelListToClient(Client *client)
     std::map<std::string, Channel *> &channels = getChannels();
     for (std::map<std::string, Channel *>::iterator it = channels.begin(); it != channels.end(); ++it)
     {
-        std::stringstream channelMsg;
-        channelMsg << ":server 322 " << client->getNickname() << " " << it->first << " :" << it->second->getClients().size() << "\r\n";
-        sendToClient(client->getFd(), channelMsg.str());
+        sendToClient(client->getFd(), RPL_LIST(client->getFd(), it->first, it->second->getClients().size(), "Existing channel"));
     }
-    std::stringstream endOfListMsg;
-    endOfListMsg << ":server 323 " << client->getNickname() << " :End of /LIST\r\n";
-    sendToClient(client->getFd(), endOfListMsg.str());
+    sendToClient(client->getFd(), RPL_LISTEND(client->getFd()));
 }
-
-
 
 /* Explications des Fonctions
 Server::Server(int port, const std::string &password)

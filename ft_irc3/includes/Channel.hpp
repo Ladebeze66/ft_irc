@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:41:35 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/17 20:08:13 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/19 15:14:50 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include <vector>
 #include <algorithm>
 #include <set>
+#include "RPL.hpp"
 
 class Client;
 

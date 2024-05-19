@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 18:32:23 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/17 18:53:09 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/19 18:55:55 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,8 @@ void ClientManager::acceptClient()
         return;
     }
 
-    _server->_clients[client_fd] = new Client(client_fd, "", "");  // Initialize with default values
+    Client *newClient = new Client(client_fd, "", "", "", "", "");   // Fournir six arguments
+    _server->_clients[client_fd] = newClient;
     struct pollfd client_pollfd;
     client_pollfd.fd = client_fd;
     client_pollfd.events = POLLIN;
@@ -35,16 +36,8 @@ void ClientManager::acceptClient()
     std::stringstream ss;
     ss << "Client connected: " << client_fd;
     _server->log(ss.str(), GREEN);
-}
 
-void ClientManager::broadcastChannelList(Client *client) {
-    std::map<std::string, Channel *> &channels = _server->getChannels();
-    for (std::map<std::string, Channel *>::iterator it = channels.begin(); it != channels.end(); ++it) {
-        std::stringstream channelMsg;
-        channelMsg << ":server 322 " << client->getNickname() << " " << it->first << " :Existing channel\r\n";
-        _server->sendToClient(client->getFd(), channelMsg.str());
-    }
-    _server->sendToClient(client->getFd(), ":server 323 " + client->getNickname() + " :End of /LIST\r\n");
+    sendWelcomeMessages(newClient, _server);
 }
 
 void ClientManager::handleClient(int client_fd)
@@ -69,12 +62,10 @@ void ClientManager::handleClient(int client_fd)
 
     while (std::getline(message_stream, line))
     {
-        // Suppression des caractères de fin de ligne
         line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
         line.erase(std::remove(line.begin(), line.end(), '\n'), line.end());
 
         _server->_commandHandler->handleCommand(client, line);
-		broadcastChannelList(_server->_clients[client_fd]);
     }
 }
 
@@ -83,7 +74,6 @@ void ClientManager::removeClient(int client_fd)
     Client *client = _server->_clients[client_fd];
     if (client)
     {
-        // Retirer le client de tous les canaux auxquels il appartient
         std::map<std::string, Channel *>::iterator it = _server->_channels.begin();
         while (it != _server->_channels.end())
         {

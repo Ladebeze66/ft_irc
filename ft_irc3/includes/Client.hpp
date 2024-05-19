@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:15:42 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/17 17:21:39 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/19 15:38:28 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,13 +18,15 @@
 class Client
 {
 public:
-    Client(int fd, const std::string &nickname, const std::string &user);
+    Client(int fd, const std::string &nickname, const std::string &user, const std::string &host, const std::string &password, const std::string &realname);
 
     int getFd() const;
     const std::string &getNickname() const;
     void setNickname(const std::string &nickname);
     const std::string &getUser() const;
     void setUser(const std::string &user);
+    const std::string &getHost() const;
+    void setHost(const std::string &host);
     const std::string &getPassword() const;
     void setPassword(const std::string &password);
     const std::string &getRealName() const;
@@ -38,10 +40,11 @@ private:
     int _fd;
     std::string _nickname;
     std::string _user;
+    std::string _host;
     std::string _password;
     std::string _realname;
     bool _authenticated;
     bool _operator;
 };
 
-#endif
+#endif // CLIENT_HPP

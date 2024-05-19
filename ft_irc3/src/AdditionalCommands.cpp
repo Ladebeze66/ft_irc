@@ -6,11 +6,46 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/16 15:27:29 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/17 20:15:14 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/19 19:22:28 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "AdditionalCommands.hpp"
+
+void sendWelcomeMessages(Client *client, Server *server) {
+    server->sendToClient(client->getFd(), RPL_WELCOME(client));
+    server->sendToClient(client->getFd(), RPL_YOURHOST(client));
+    server->sendToClient(client->getFd(), RPL_CREATED(client));
+    server->sendToClient(client->getFd(), RPL_MYINFO(client));
+    server->sendToClient(client->getFd(), RPL_ISUPPORT(client, "MODES=EXAMPLE"));
+
+	sendMotd(client, server);
+}
+
+void sendMotd(Client *client, Server *server) {
+    std::ifstream motdFile("motd.txt");
+    if (motdFile.is_open()) {
+        std::string line;
+        server->sendToClient(client->getFd(), RPL_MOTDSTART(client));
+        while (std::getline(motdFile, line)) {
+            server->sendToClient(client->getFd(), RPL_MOTD(client, line));
+        }
+        server->sendToClient(client->getFd(), RPL_ENDOFMOTD(client));
+        motdFile.close();
+    } else {
+        server->sendToClient(client->getFd(), ERR_NOMOTD(client));
+    }
+}
+
+void broadcastChannelList(Client *client, Server *server)
+{
+    std::map<std::string, Channel *> &channels = server->getChannels();
+    for (std::map<std::string, Channel *>::iterator it = channels.begin(); it != channels.end(); ++it)
+    {
+        server->sendToClient(client->getFd(), RPL_LIST(client->getFd(), it->first, it->second->getClients().size(), "Existing channel"));
+    }
+    server->sendToClient(client->getFd(), RPL_LISTEND(client->getFd()));
+}
 
 // Fonction pour gérer la commande PART
 void handlePartCommand(Server *server, Client *client, const std::string &command)

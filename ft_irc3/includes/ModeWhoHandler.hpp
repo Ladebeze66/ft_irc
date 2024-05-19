@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 16:08:48 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/17 18:08:06 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/19 15:15:39 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,10 @@
 #include "Client.hpp"
 #include "Channel.hpp"
 #include "Utils.hpp"
+#include "RPL.hpp"
+
+#include <sstream>
+#include <iostream>
 
 class Server;
 

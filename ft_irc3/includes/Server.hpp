@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:15:13 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/17 20:03:06 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/19 16:30:56 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include "ClientManager.hpp"
 #include "CommandHandler.hpp"
 #include "AdditionalCommands.hpp"
+#include "RPL.hpp"
 
 #include <sys/socket.h>
 #include <netinet/in.h>
