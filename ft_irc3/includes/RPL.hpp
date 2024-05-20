@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 15:12:47 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/19 19:07:25 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/19 22:27:05 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@
 #define CLIENT_NICK(client) ((client)->getNickname())
 #define CLIENT_USER(client) ((client)->getUser())
 #define CLIENT_HOST(client) ((client)->getHost())
+#define CLIENT_REALNAME(client) ((client)->getRealName())
 
 // Fonctions pour générer les réponses RPL
 inline std::string RPL_WELCOME(Client* client) {
@@ -217,5 +218,120 @@ inline std::string ERR_UNKNOWNCOMMAND(int clientFd, const std::string& command)
     return oss.str();
 }
 
+// RPL Mode Messages
+inline std::string RPL_CHANNELMODEIS(int clientFd, const std::string& channel, const std::string& mode)
+{
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 324 " << clientFd << " " << channel << " " << mode << "\r\n";
+    return oss.str();
+}
+
+inline std::string RPL_NOCHANMODES(int clientFd, const std::string& channel)
+{
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 477 " << clientFd << " " << channel << " :Channel doesn't support modes\r\n";
+    return oss.str();
+}
+
+inline std::string ERR_NOSUCHCHANNEL(int clientFd, const std::string& channel)
+{
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 403 " << clientFd << " " << channel << " :No such channel\r\n";
+    return oss.str();
+}
+
+inline std::string ERR_CHANOPRIVSNEEDED(int clientFd, const std::string& channel)
+{
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 482 " << clientFd << " " << channel << " :You're not channel operator\r\n";
+    return oss.str();
+}
+
+inline std::string ERR_NOSUCHNICK(int clientFd, const std::string& nick)
+{
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 401 " << clientFd << " " << nick << " :No such nick/channel\r\n";
+    return oss.str();
+}
+
+// WHO Command RPLs
+inline std::string RPL_WHOREPLY(const std::string& channel, Client* target)
+{
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 352 " << CLIENT_NICK(target) << " " << channel << " "
+        << CLIENT_USER(target) << " " << CLIENT_HOST(target) << " " << SERVER_NAME << " "
+        << CLIENT_NICK(target) << " H :0 " << CLIENT_REALNAME(target) << "\r\n";
+    return oss.str();
+}
+
+inline std::string RPL_ENDOFWHO(int clientFd, const std::string& channel)
+{
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 315 " << clientFd << " " << channel << " :End of /WHO list.\r\n";
+    return oss.str();
+}
+
+// WHOIS Command RPLs
+inline std::string RPL_WHOISUSER(int clientFd, Client* target)
+{
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 311 " << clientFd << " " << CLIENT_NICK(target) << " "
+        << CLIENT_USER(target) << " " << CLIENT_HOST(target) << " * :" << CLIENT_REALNAME(target) << "\r\n";
+    return oss.str();
+}
+
+inline std::string RPL_WHOISSERVER(int clientFd, const std::string& targetNick, const std::string& serverInfo)
+{
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 312 " << clientFd << " " << targetNick << " " << SERVER_NAME
+        << " :" << serverInfo << "\r\n";
+    return oss.str();
+}
+
+inline std::string RPL_ENDOFWHOIS(int clientFd, const std::string& targetNick)
+{
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 318 " << clientFd << " " << targetNick << " :End of /WHOIS list.\r\n";
+    return oss.str();
+}
+
+inline std::string ERR_NONICKNAMEGIVEN(int clientFd)
+{
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 431 " << clientFd << " :No nickname given\r\n";
+    return oss.str();
+}
+
+// CAP Command RPLs
+inline std::string RPL_CAP(int clientFd, const std::string& subcommand, const std::string& capabilities)
+{
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " CAP " << clientFd << " " << subcommand << " :" << capabilities << "\r\n";
+    return oss.str();
+}
+
+// ERR_NOTREGISTERED
+inline std::string ERR_NOTREGISTERED(int clientFd)
+{
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 451 " << clientFd << " :You have not registered\r\n";
+    return oss.str();
+}
+
+inline std::string RPL_PASSACCEPTED(Client* client)
+{
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " NOTICE " << CLIENT_FD(client)
+        << " :Password accepted!\r\n";
+    return oss.str();
+}
+
+// Add this function to handle the CAP END response
+inline std::string RPL_CAPEND(int clientFd)
+{
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " CAP " << clientFd << " END\r\n";
+    return oss.str();
+}
 
 #endif // RPL_HPP

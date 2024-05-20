@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 18:32:23 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/19 18:55:55 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/19 22:09:39 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,10 +34,8 @@ void ClientManager::acceptClient()
     _server->_poll_fds.push_back(client_pollfd);
 
     std::stringstream ss;
-    ss << "Client connected: " << client_fd;
-    _server->log(ss.str(), GREEN);
-
-    sendWelcomeMessages(newClient, _server);
+    ss << "Client attempting connection: " << client_fd;
+    _server->log(ss.str(), YELLOW);
 }
 
 void ClientManager::handleClient(int client_fd)

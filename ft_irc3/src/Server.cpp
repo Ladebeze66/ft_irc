@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:17:12 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/19 19:21:54 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/19 22:16:03 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,14 @@ void Server::initServer()
         exit(EXIT_FAILURE);
     }
 
+    int opt = 1;
+    if (setsockopt(_server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1)
+    {
+        log("Failed to set socket options.", RED);
+        close(_server_fd);
+        exit(EXIT_FAILURE);
+    }
+
     struct sockaddr_in server_addr;
     std::memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
@@ -52,12 +60,14 @@ void Server::initServer()
     if (bind(_server_fd, (struct sockaddr*)&server_addr, sizeof(server_addr)) == -1)
     {
         log("Failed to bind socket.", RED);
+        close(_server_fd);  // Close the socket if bind fails
         exit(EXIT_FAILURE);
     }
 
     if (listen(_server_fd, SOMAXCONN) == -1)
     {
         log("Failed to listen on socket.", RED);
+        close(_server_fd);  // Close the socket if listen fails
         exit(EXIT_FAILURE);
     }
 
@@ -108,6 +118,7 @@ void Server::run()
         }
     }
 }
+
 
 std::map<std::string, Channel *> &Server::getChannels()
 {
@@ -202,6 +213,26 @@ void Server::sendChannelListToClient(Client *client)
     }
     sendToClient(client->getFd(), RPL_LISTEND(client->getFd()));
 }
+
+void Server::disconnectClient(int clientFd)
+{
+    close(clientFd);
+    _clients.erase(clientFd);
+
+    for (std::vector<struct pollfd>::iterator it = _poll_fds.begin(); it != _poll_fds.end(); ++it)
+    {
+        if (it->fd == clientFd)
+        {
+            _poll_fds.erase(it);
+            break;
+        }
+    }
+
+    std::ostringstream oss;
+    oss << "Client disconnected: " << clientFd;
+    log(oss.str(), YELLOW);
+}
+
 
 /* Explications des Fonctions
 Server::Server(int port, const std::string &password)

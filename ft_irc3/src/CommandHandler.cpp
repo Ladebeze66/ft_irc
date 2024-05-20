@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 18:26:34 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/19 19:13:14 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/19 23:47:26 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,33 +54,15 @@ void CommandHandler::handleCapCommand(Client* client, const std::vector<std::str
     }
 
     std::string subcommand = tokens[1];
+    std::string capabilities = "multi-prefix extended-join account-notify batch invite-notify";
 
     if (subcommand == "LS")
     {
-        // Example for CAP LS response
-        std::vector<std::string> capLines;
-        capLines.push_back("multi-prefix extended-join account-notify batch invite-notify tls");
-        capLines.push_back("cap-notify server-time example.org/dummy-cap=dummyvalue example.org/second-dummy-cap");
-        capLines.push_back("userhost-in-names sasl=EXTERNAL,DH-AES,DH-BLOWFISH,ECDSA-NIST256P-CHALLENGE,PLAIN");
-
-        for (size_t i = 0; i < capLines.size(); ++i)
-        {
-            std::ostringstream oss;
-            oss << ":irc.example.com CAP " << client->getNickname() << " LS";
-            if (i != capLines.size() - 1)
-                oss << " * :";
-            else
-                oss << " :";
-            oss << capLines[i] << "\r\n";
-            _server->sendToClient(client->getFd(), oss.str());
-        }
+        _server->sendToClient(client->getFd(), RPL_CAP(client->getFd(), "LS", capabilities));
     }
     else if (subcommand == "LIST")
     {
-        // Example for CAP LIST response
-        std::ostringstream oss;
-        oss << ":irc.example.com CAP " << client->getNickname() << " LIST :example.org/example-cap example.org/second-example-cap account-notify invite-notify batch example.org/third-example-cap\r\n";
-        _server->sendToClient(client->getFd(), oss.str());
+        _server->sendToClient(client->getFd(), RPL_CAP(client->getFd(), "LIST", capabilities));
     }
     else if (subcommand == "REQ")
     {
@@ -89,21 +71,16 @@ void CommandHandler::handleCapCommand(Client* client, const std::vector<std::str
             _server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client->getFd(), "CAP"));
             return;
         }
-
-        // Example for CAP REQ response
-        std::string requestedCaps = tokens[2];
-        std::ostringstream ackResponse;
-        ackResponse << ":irc.example.com CAP " << client->getNickname() << " ACK :" << requestedCaps << "\r\n";
-        _server->sendToClient(client->getFd(), ackResponse.str());
+        std::string requestedCapabilities = tokens[2];
+        // For simplicity, we assume all requested capabilities are accepted
+        _server->sendToClient(client->getFd(), RPL_CAP(client->getFd(), "ACK", requestedCapabilities));
     }
     else if (subcommand == "END")
     {
-        // Example for CAP END response
-        _server->sendToClient(client->getFd(), ":irc.example.com CAP " + client->getNickname() + " END\r\n");
+        _server->sendToClient(client->getFd(), RPL_CAPEND(client->getFd()));
     }
     else
     {
-        // Unknown CAP subcommand
         _server->sendToClient(client->getFd(), ERR_UNKNOWNCOMMAND(client->getFd(), "CAP"));
     }
 }
@@ -168,39 +145,40 @@ void CommandHandler::handleNick(Client* client, const std::vector<std::string>& 
         _server->sendToClient(client->getFd(), ERR_NICKNAMEINUSE(client, newNick));
         return;
     }
-
-    std::string oldNick = client->getNickname();
     client->setNickname(newNick);
 
-    if (!oldNick.empty()) {
-        _server->broadcast(":" + oldNick + " NICK " + newNick + "\r\n");
-    }
-
     _server->sendToClient(client->getFd(), ":" + newNick + " NICK " + newNick + "\r\n");
-    _server->log("Client " + oldNick + " changed nickname to " + newNick, GREEN);
+    _server->log("Client NickName is " + newNick, GREEN);
 }
 
 void CommandHandler::handleUser(Client* client, const std::vector<std::string>& tokens)
 {
-    if (tokens.size() < 5) {
-        _server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, "USER"));
-        return;
-    }
-
-    if (client->isAuthenticated()) {
-        _server->sendToClient(client->getFd(), ERR_ALREADYREGISTERED(client));
-        return;
-    }
-
+    // Set the user and realname fields
     client->setUser(tokens[1]);
-    client->setRealName(tokens[4].substr(1)); // remove leading ':'
+    std::string realname = tokens[4];
+    if (realname[0] == ':') {
+        realname = realname.substr(1); // Remove leading ':'
+    }
+    client->setRealName(realname);
 
+    // Log the values for debugging
+    std::ostringstream logMsg;
+    logMsg << "Client " << client->getFd() << ": USER command set username to " << tokens[1] << " and real name to " << realname;
+    _server->log(logMsg.str(), BLUE);
+
+    // Authenticate if password and nickname are already set
     if (client->getPassword() == _server->_password && !client->getNickname().empty()) {
         client->authenticate();
         sendWelcomeMessages(client, _server);
-        _server->log("Client " + client->getNickname() + " authenticated.", GREEN);
+        _server->log("Client " + client->getNickname() + " authenticated successfully.", GREEN);
+    } else {
+        std::ostringstream authFailMsg;
+        authFailMsg << "Client " << client->getFd() << ": USER command failed - authentication conditions not met.";
+        _server->log(authFailMsg.str(), RED);
     }
 }
+
+
 
 void CommandHandler::processCommand(Client *client, const std::string &command)
 {
@@ -230,6 +208,11 @@ void CommandHandler::processCommand(Client *client, const std::string &command)
     {
         ModeWhoHandler whoHandler(_server);
         whoHandler.handleWhoCommand(client, command);
+    }
+	else if (command.find("WHOIS") == 0)
+    {
+        ModeWhoHandler whoHandler(_server);
+        whoHandler.handleWhoisCommand(client, command);
     }
 	else if (command.find("PING") == 0)
     {

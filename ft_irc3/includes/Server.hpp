@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:15:13 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/19 16:30:56 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/19 21:13:24 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ public:
 	void broadcast(const std::string &message);
     Client* getClientByName(const std::string &name); // Ajoutez cette méthode
 	void sendChannelListToClient(Client *client);
+	void disconnectClient(int clientFd);
 
 
 protected:
