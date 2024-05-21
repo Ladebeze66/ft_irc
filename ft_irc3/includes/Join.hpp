@@ -1,38 +1,34 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Who.hpp                                            :+:      :+:    :+:   */
+/*   Join.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/05/17 16:08:48 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/21 18:04:10 by fgras-ca         ###   ########.fr       */
+/*   Created: 2024/05/21 19:51:08 by fgras-ca          #+#    #+#             */
+/*   Updated: 2024/05/21 20:13:15 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef WHO_HPP
-#define WHO_HPP
+#ifndef JOIN_HPP
+#define JOIN_HPP
 
 #include "Server.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"
-#include "Utils.hpp"
 #include "RPL.hpp"
 
-#include <sstream>
-#include <iostream>
-
 class Server;
+class Client;
+class Channel;
 
-class WhoHandler
+class JoinHandler
 {
 public:
-    WhoHandler(Server *server);
-    void handleWhoCommand(Client *client, const std::string &command);
-	void handleWhoisCommand(Client *client, const std::string &command);
+    void handleJoinCommand(Client *client, const std::string &channelName, Server *server);
 
 private:
-    Server *_server;
+    std::string getUsersList(Channel *channel);
 };
 
-#endif
+#endif // JOIN_HPP

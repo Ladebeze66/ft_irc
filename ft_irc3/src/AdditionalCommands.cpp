@@ -6,44 +6,47 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/16 15:27:29 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/21 13:52:54 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/21 20:22:22 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "AdditionalCommands.hpp"
 
-void sendWelcomeMessages(Client *client, Server *server)
-{
-	server->sendToClient(client->getFd(), RPL_WELCOME(client));
-	server->sendToClient(client->getFd(), RPL_YOURHOST(client));
-	server->sendToClient(client->getFd(), RPL_CREATED(client));
-	server->sendToClient(client->getFd(), RPL_MYINFO(client));
-	server->sendToClient(client->getFd(), RPL_ISUPPORT(client, "MODES=EXAMPLE"));
+AdditionalCommands::AdditionalCommands(Server *server) : _server(server)
+{}
 
-	sendMotd(client, server);
+void AdditionalCommands::processCommand(Client *client, const std::string &command)
+{
+    if (command.find("PART") == 0)
+    {
+        handlePartCommand(_server, client, command);
+    }
+    else if (command.find("PRIVMSG") == 0)
+    {
+        handlePrivmsgCommand(_server, client, command);
+    }
+    else if (command.find("WHO") == 0)
+    {
+        WhoHandler whoHandler(_server);
+        whoHandler.handleWhoCommand(client, command);
+    }
+	else if (command.find("WHOIS") == 0)
+    {
+        WhoHandler whoHandler(_server);
+        whoHandler.handleWhoisCommand(client, command);
+    }
+	else if (command.find("LIST") == 0)
+    {
+        broadcastChannelList(client, _server);
+    }
+    else
+    {
+        _server->sendToClient(client->getFd(), ERR_UNKNOWNCOMMAND(client, command));
+        _server->log("Message from client " + client->getNickname() + ": " + command, MAGENTA);
+    }
 }
 
-void sendMotd(Client *client, Server *server)
-{
-	std::ifstream motdFile("motd.txt");
-	if (motdFile.is_open())
-	{
-		std::string line;
-		server->sendToClient(client->getFd(), RPL_MOTDSTART(client));
-		while (std::getline(motdFile, line))
-		{
-			server->sendToClient(client->getFd(), RPL_MOTD(client, line));
-		}
-		server->sendToClient(client->getFd(), RPL_ENDOFMOTD(client));
-		motdFile.close();
-	}
-	else
-	{
-		server->sendToClient(client->getFd(), ERR_NOMOTD(client));
-	}
-}
-
-void broadcastChannelList(Client *client, Server *server)
+void AdditionalCommands::broadcastChannelList(Client *client, Server *server)
 {
 	std::map<std::string, Channel *> &channels = server->getChannels();
 	for (std::map<std::string, Channel *>::iterator it = channels.begin(); it != channels.end(); ++it)
@@ -54,7 +57,7 @@ void broadcastChannelList(Client *client, Server *server)
 }
 
 // Fonction pour gérer la commande PART
-void handlePartCommand(Server *server, Client *client, const std::string &command)
+void AdditionalCommands::handlePartCommand(Server *server, Client *client, const std::string &command)
 {
 	std::istringstream iss(command);
 	std::string cmd, channelName;
@@ -87,25 +90,7 @@ void handlePartCommand(Server *server, Client *client, const std::string &comman
 	}
 }
 
-// Fonction pour gérer la commande NICK
-void handleNickCommand(Server *server, Client *client, const std::string &command)
-{
-	std::istringstream iss(command);
-	std::string cmd, newNick;
-	iss >> cmd >> newNick;
-
-	std::stringstream nickMsg;
-	nickMsg << ":" << client->getNickname() << " NICK " << newNick << "\r\n";
-	server->sendToClient(client->getFd(), nickMsg.str());
-
-	client->setNickname(newNick);
-
-	std::stringstream ss;
-	ss << "Client " << client->getFd() << " changed nickname to " << newNick;
-	server->log(ss.str(), GREEN);
-}
-
-void handlePrivmsgCommand(Server *server, Client *client, const std::string &command)
+void AdditionalCommands::handlePrivmsgCommand(Server *server, Client *client, const std::string &command)
 {
 	std::istringstream iss(command);
 	std::string cmd, target, message;

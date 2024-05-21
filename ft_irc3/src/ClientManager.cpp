@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 18:32:23 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/21 14:09:07 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/21 20:28:41 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,29 +43,49 @@ void ClientManager::handleClient(int client_fd)
     char buffer[1024];
     std::memset(buffer, 0, sizeof(buffer));
     int bytes_received = recv(client_fd, buffer, sizeof(buffer), 0);
+
     if (bytes_received <= 0)
     {
+        std::ostringstream oss;
+        oss << "Client disconnected: " << client_fd;
+        _server->log(oss.str(), RED);
         removeClient(client_fd);
         return;
     }
 
-    std::string message(buffer);
-    std::stringstream ss;
-    ss << "Received from client " << client_fd << ": " << message;
-    _server->log(ss.str(), BLUE);
+    std::string message(buffer, bytes_received);
+    std::ostringstream oss;
+    oss << "Received from client " << client_fd << ": " << message;
+    _server->log(oss.str(), BLUE);
 
-    Client *client = _server->_clients[client_fd];
+    Client* client = _server->getClients()[client_fd];
+    if (!client)
+    {
+        std::ostringstream oss;
+        oss << "Client not found for fd: " << client_fd;
+        _server->log(oss.str(), RED);
+        return;
+    }
+
     std::istringstream message_stream(message);
     std::string line;
 
     while (std::getline(message_stream, line))
     {
+        // Remove trailing '\r' and '\n'
         line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
         line.erase(std::remove(line.begin(), line.end(), '\n'), line.end());
 
-        _server->_commandHandler->handleCommand(client, line);
+        if (!line.empty())
+        {
+            std::ostringstream oss;
+            oss << "Processing command from client " << client_fd << ": " << line;
+            _server->log(oss.str(), BLUE);
+            _server->_commandHandler->handleCommand(client, line);
+        }
     }
 }
+
 
 void ClientManager::removeClient(int clientFd)
 {
@@ -109,4 +129,3 @@ void ClientManager::removeClient(int clientFd)
     ss << "Client disconnected: " << clientFd;
     _server->log(ss.str(), YELLOW);
 }
-

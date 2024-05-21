@@ -6,14 +6,11 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 16:09:20 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/21 13:48:51 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/21 18:03:56 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Who.hpp"
-#include "Channel.hpp"
-#include "RPL.hpp"
-#include <sstream>
 
 WhoHandler::WhoHandler(Server *server)
     : _server(server)

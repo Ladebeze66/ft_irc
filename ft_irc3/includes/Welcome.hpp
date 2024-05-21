@@ -1,38 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Who.hpp                                            :+:      :+:    :+:   */
+/*   Welcome.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/05/17 16:08:48 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/21 18:04:10 by fgras-ca         ###   ########.fr       */
+/*   Created: 2024/05/21 19:53:17 by fgras-ca          #+#    #+#             */
+/*   Updated: 2024/05/21 19:53:24 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef WHO_HPP
-#define WHO_HPP
+#ifndef WELCOME_HPP
+#define WELCOME_HPP
 
-#include "Server.hpp"
 #include "Client.hpp"
-#include "Channel.hpp"
-#include "Utils.hpp"
-#include "RPL.hpp"
+#include "Server.hpp"
+#include <string>
 
-#include <sstream>
-#include <iostream>
-
-class Server;
-
-class WhoHandler
+class WelcomeHandler
 {
 public:
-    WhoHandler(Server *server);
-    void handleWhoCommand(Client *client, const std::string &command);
-	void handleWhoisCommand(Client *client, const std::string &command);
-
-private:
-    Server *_server;
+    void sendWelcomeMessages(Client *client, Server *server);
+    void sendMotd(Client *client, Server *server);
 };
 
-#endif
+#endif // WELCOME_HPP

@@ -6,16 +6,22 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 18:26:34 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/21 14:19:19 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/21 20:24:52 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CommandHandler.hpp"
 
 CommandHandler::CommandHandler(Server *server)
-    : _server(server)
-{
-}
+    : _server(server), _additionalCommands(new AdditionalCommands(server))
+	{
+		// Ensure that _server is not null
+		if (!_server)
+		{
+			std::cerr << "Server pointer is null in CommandHandler constructor." << std::endl;
+			exit(EXIT_FAILURE);
+		}
+	}
 
 void CommandHandler::handleCommand(Client* client, const std::string& command)
 {
@@ -34,12 +40,27 @@ void CommandHandler::handleCommand(Client* client, const std::string& command)
         handleNick(client, tokens);
     } else if (commandType == "USER") {
         handleUser(client, tokens);
-    } else {
+    } else if (commandType == "QUIT") {
+        handleQuitCommand(client, tokens);
+    } else if (commandType == "PING")
+	{
+		handlePingCommand(client, tokens);
+	}
+	else if (commandType == "ERROR") {
+        if (tokens.size() > 1) {
+            handleErrorCommand(client, tokens[1]);
+        }
+    }
+	else if (commandType == "JOIN") {
+        JoinHandler joinHandler;
+        joinHandler.handleJoinCommand(client, tokens[1], _server);
+	}
+	else {
         if (!client->isAuthenticated()) {
             _server->sendToClient(client->getFd(), ERR_NOTREGISTERED(client));
             _server->log("Client " + client->getNickname() + " attempted to send a command before registering.", RED);
         } else {
-            processCommand(client, command);
+            _additionalCommands->processCommand(client, command);
         }
     }
     std::cout << "Client " << client->getFd() << " " << client->getNickname() << " " << client->getUser() << " " << client->getPassword() << " " << client->getRealName() << std::endl;
@@ -145,145 +166,106 @@ void CommandHandler::handleNick(Client* client, const std::vector<std::string>& 
         _server->sendToClient(client->getFd(), ERR_NICKNAMEINUSE(client, newNick));
         return;
     }
-    
+
+    std::string oldNick = client->getNickname();
     client->setNickname(newNick);
 
-    _server->sendToClient(client->getFd(), ":" + newNick + " NICK " + newNick + "\r\n");
+    // Envoyer le message NICK à tous les clients connectés
+    std::string nickMessage = ":" + oldNick + " NICK " + newNick + "\r\n";
+    for (std::map<int, Client*>::iterator it = _server->_clients.begin(); it != _server->_clients.end(); ++it) {
+        _server->sendToClient(it->second->getFd(), nickMessage);
+    }
 
     std::ostringstream oss;
-    oss << "Client " << client->getFd() << " changed nickname to " << newNick;
+    oss << "Client " << client->getFd() << " changed nickname from " << oldNick << " to " << newNick;
     _server->log(oss.str(), GREEN);
 }
 
+
 void CommandHandler::handleUser(Client* client, const std::vector<std::string>& tokens)
 {
-    // Set the user and realname fields
-    client->setUser(tokens[1]);
-    std::string realname = tokens[4];
-    if (realname[0] == ':')
-	{
-        realname = realname.substr(1); // Remove leading ':'
+    if (tokens.size() < 5) {
+        _server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client->getFd(), "USER"));
+
+        std::ostringstream oss;
+        oss << "Client " << client->getFd() << ": USER command failed - not enough parameters.";
+        _server->log(oss.str(), RED);
+
+        return;
     }
+
+    if (client->isAuthenticated()) {
+        _server->sendToClient(client->getFd(), ERR_ALREADYREGISTERED(client));
+
+        std::ostringstream oss;
+        oss << "Client " << client->getFd() << ": USER command failed - already registered.";
+        _server->log(oss.str(), RED);
+
+        return;
+    }
+
+    std::string username = tokens[1];
+    std::string realname = tokens[4].substr(1); // remove leading ':'
+
+    client->setUser(username);
     client->setRealName(realname);
 
-    // Log the values for debugging
-    std::ostringstream logMsg;
-    logMsg << "Client " << client->getFd() << ": USER command set username to " << tokens[1] << " and real name to " << realname;
-    _server->log(logMsg.str(), BLUE);
+    std::ostringstream oss;
+    oss << "Client " << client->getFd() << ": USER command set username to " << username << " and real name to " << realname;
+    _server->log(oss.str(), BLUE);
 
-    // Authenticate if password and nickname are already set
-    if (client->getPassword() == _server->_password && !client->getNickname().empty())
-	{
+    if (client->getPassword() == _server->_password && !client->getNickname().empty()) {
         client->authenticate();
-        sendWelcomeMessages(client, _server);
-        _server->log("Client " + client->getNickname() + " authenticated successfully.", GREEN);
+        WelcomeHandler welcomeHandler;
+        welcomeHandler.sendWelcomeMessages(client, _server);
+        _server->log("Client " + client->getNickname() + " authenticated.", GREEN);
+    } else {
+        std::ostringstream oss;
+        oss << "Client " << client->getFd() << ": USER command failed - authentication conditions not met.";
+        _server->log(oss.str(), RED);
     }
-	else
-	{
-        std::ostringstream authFailMsg;
-        authFailMsg << "Client " << client->getFd() << ": USER command failed - authentication conditions not met.";
-        _server->log(authFailMsg.str(), RED);
-    }
-}
-
-
-
-void CommandHandler::processCommand(Client *client, const std::string &command)
-{
-    if (command.find("JOIN") == 0)
-    {
-        std::string channelName = command.substr(5);
-        handleJoinCommand(client, channelName);
-    }
-    else if (command.find("PART") == 0)
-    {
-        handlePartCommand(_server, client, command);
-    }
-    /*else if (command.find("NICK") == 0)
-    {
-        handleNickCommand(_server, client, command);
-    }*/
-    else if (command.find("PRIVMSG") == 0)
-    {
-        handlePrivmsgCommand(_server, client, command);
-    }
-    else if (command.find("WHO") == 0)
-    {
-        WhoHandler whoHandler(_server);
-        whoHandler.handleWhoCommand(client, command);
-    }
-	else if (command.find("WHOIS") == 0)
-    {
-        WhoHandler whoHandler(_server);
-        whoHandler.handleWhoisCommand(client, command);
-    }
-	else if (command.find("PING") == 0)
-    {
-        std::vector<std::string> tokens = split(command, " ");
-        handlePingCommand(client, tokens);
-    }
-	else if (command.find("LIST") == 0)
-    {
-        broadcastChannelList(client, _server);
-    }
-    else
-    {
-        _server->sendToClient(client->getFd(), ERR_UNKNOWNCOMMAND(client, command));
-        _server->log("Message from client " + client->getNickname() + ": " + command, MAGENTA);
-    }
-}
-
-void CommandHandler::handleJoinCommand(Client *client, const std::string &channelName)
-{
-    if (_server->getChannels().find(channelName) == _server->getChannels().end())
-    {
-        _server->getChannels()[channelName] = new Channel(channelName);
-        _server->log("Channel created: " + channelName, GREEN);
-
-        // Notifier tous les clients de la création du canal
-        _server->broadcast(":server NOTICE * :New channel created: " + channelName + "\r\n");
-    }
-    Channel *channel = _server->getChannels()[channelName];
-    channel->addClient(client);
-
-    std::stringstream joinMsg;
-    joinMsg << ":" << client->getNickname() << " JOIN :" << channelName << "\r\n";
-    _server->sendToClient(client->getFd(), joinMsg.str());
-
-    std::string usersList = getUsersList(channel);
-    _server->sendToClient(client->getFd(), usersList);
-
-    std::stringstream endOfNamesMsg;
-    endOfNamesMsg << ":server 366 " << client->getNickname() << " " << channelName << " :End of /NAMES list.\r\n";
-    _server->sendToClient(client->getFd(), endOfNamesMsg.str());
-
-    std::stringstream ss;
-    ss << "Client " << client->getNickname() << " joined channel " << channelName;
-    _server->log(ss.str(), MAGENTA);
-}
-
-std::string CommandHandler::getUsersList(Channel *channel)
-{
-    std::vector<Client *> clients = channel->getClients();
-    std::stringstream ss;
-    ss << ":server 353 " << clients[0]->getNickname() << " = " << channel->getName() << " :";
-    for (size_t i = 0; i < clients.size(); ++i)
-    {
-        if (i > 0)
-            ss << " ";
-        ss << clients[i]->getNickname();
-    }
-    ss << "\r\n";
-    return ss.str();
 }
 
 void CommandHandler::handlePingCommand(Client* client, const std::vector<std::string>& tokens)
 {
-    if (tokens.size() < 2) {
-        _server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, "PING"));
+    if (tokens.size() < 2)
+    {
+        _server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client->getFd(), "PING"));
         return;
     }
 
-    std::string token = tokens[1];
-    _server->sendToClient(client->getFd(), RPL_PONG(token));
+    std::string serverName = tokens[1];
+    std::string pongMessage = ":" + serverName + " PONG " + serverName + "\r\n";
+    _server->sendToClient(client->getFd(), pongMessage);
+}
+
+
+void CommandHandler::handleQuitCommand(Client* client, const std::vector<std::string>& tokens)
+{
+    std::string reason = "Quit: ";
+    if (tokens.size() > 1)
+    {
+        reason += tokens[1];
+    }
+
+    std::string quitMessage = ":" + client->getNickname() + " QUIT :" + reason + "\r\n";
+
+    std::map<std::string, Channel*>::iterator it;
+    for (it = _server->getChannels().begin(); it != _server->getChannels().end(); ++it)
+    {
+        if (it->second->hasClient(client))
+        {
+            it->second->broadcast(quitMessage, client, _server);
+            it->second->removeClient(client);
+        }
+    }
+
+    _server->sendToClient(client->getFd(), "ERROR :" + reason + "\r\n");
+    _server->disconnectClient(client->getFd());
+}
+
+void CommandHandler::handleErrorCommand(Client* client, const std::string &message)
+{
+    _server->sendToClient(client->getFd(), "ERROR :" + message + "\r\n");
+    _server->disconnectClient(client->getFd());
 }

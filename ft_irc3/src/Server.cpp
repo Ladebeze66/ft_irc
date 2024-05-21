@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:17:12 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/21 14:18:03 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/21 20:31:51 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -183,6 +183,10 @@ void Server::sendToClient(int client_fd, const std::string &message)
 		log(ss.str(), BLUE);
 	}
 }
+std::map<int, Client *> &Server::getClients()
+{
+    return _clients;
+}
 
 void Server::broadcast(const std::string &message)
 {
@@ -214,26 +218,31 @@ void Server::sendChannelListToClient(Client *client)
 	sendToClient(client->getFd(), RPL_LISTEND(client->getFd()));
 }
 
+bool Server::MatchFd(const pollfd& pfd, int clientFd)
+{
+	return pfd.fd == clientFd;
+}
+
+void Server::removePollFd(int clientFd)
+{
+	for (std::vector<struct pollfd>::iterator it = _poll_fds.begin(); it != _poll_fds.end(); ++it)
+	{
+		if (MatchFd(*it, clientFd))
+		{
+			_poll_fds.erase(it);
+			break;
+		}
+	}
+}
+
 void Server::disconnectClient(int clientFd)
 {
-    Client* client = _clients[clientFd];
-    if (client)
-    {
-        log("Disconnecting client: " + client->getNickname(), YELLOW);
-        _clients.erase(clientFd);
-        delete client;
-    }
+	close(clientFd);
 
-    struct MatchFd
-    {
-        int fd;
-        MatchFd(int fd) : fd(fd) {}
-        bool operator()(const pollfd& pfd) const { return pfd.fd == fd; }
-    };
+	_clients.erase(clientFd);
+	removePollFd(clientFd);
 
-    _poll_fds.erase(std::remove_if(_poll_fds.begin(), _poll_fds.end(), MatchFd(clientFd)), _poll_fds.end());
-
-    std::ostringstream oss;
-    oss << "Client disconnected: " << clientFd;
-    log(oss.str(), YELLOW);
+	std::ostringstream oss;
+	oss << "Client disconnected: " << clientFd;
+	log(oss.str(), YELLOW);
 }

@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:15:13 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/19 21:13:24 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/21 19:44:24 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ class Client;
 class Channel;
 class ClientManager;
 class CommandHandler;
+class AdditionalCommands;
 
 class Server
 {
@@ -56,6 +57,8 @@ public:
     Client* getClientByName(const std::string &name); // Ajoutez cette méthode
 	void sendChannelListToClient(Client *client);
 	void disconnectClient(int clientFd);
+	bool MatchFd(const pollfd& pfd, int clientFd);
+	void removePollFd(int clientFd);
 
 
 protected:

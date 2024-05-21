@@ -6,21 +6,15 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:42:57 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/17 20:08:28 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/21 19:27:42 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Channel.hpp"
-#include "Client.hpp"
 
-Channel::Channel(const std::string &name)
-    : _name(name)
-{
-}
+Channel::Channel(const std::string &name) : _name(name) {}
 
-Channel::~Channel()
-{
-}
+Channel::~Channel() {}
 
 const std::string &Channel::getName() const
 {
@@ -49,13 +43,27 @@ const std::vector<Client *> &Channel::getClients() const
 
 void Channel::addOperator(Client *client)
 {
-    if (std::find(_operators.begin(), _operators.end(), client) == _operators.end())
-    {
-        _operators.push_back(client);
-    }
+    _operators.push_back(client);
 }
 
 bool Channel::isOperator(Client *client) const
 {
     return std::find(_operators.begin(), _operators.end(), client) != _operators.end();
+}
+
+bool Channel::hasClient(Client *client) const
+{
+    return std::find(_clients.begin(), _clients.end(), client) != _clients.end();
+}
+
+void Channel::broadcast(const std::string &message, Client *_client, Server *server)
+{
+    for (std::vector<Client *>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+    {
+        if (*it != _client)
+        {
+            // Send message to each client except the sender
+            server->sendToClient((*it)->getFd(), message);
+        }
+    }
 }
