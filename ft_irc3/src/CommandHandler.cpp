@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 18:26:34 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/19 23:47:26 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/21 14:19:19 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,10 +145,14 @@ void CommandHandler::handleNick(Client* client, const std::vector<std::string>& 
         _server->sendToClient(client->getFd(), ERR_NICKNAMEINUSE(client, newNick));
         return;
     }
+    
     client->setNickname(newNick);
 
     _server->sendToClient(client->getFd(), ":" + newNick + " NICK " + newNick + "\r\n");
-    _server->log("Client NickName is " + newNick, GREEN);
+
+    std::ostringstream oss;
+    oss << "Client " << client->getFd() << " changed nickname to " << newNick;
+    _server->log(oss.str(), GREEN);
 }
 
 void CommandHandler::handleUser(Client* client, const std::vector<std::string>& tokens)
@@ -156,7 +160,8 @@ void CommandHandler::handleUser(Client* client, const std::vector<std::string>& 
     // Set the user and realname fields
     client->setUser(tokens[1]);
     std::string realname = tokens[4];
-    if (realname[0] == ':') {
+    if (realname[0] == ':')
+	{
         realname = realname.substr(1); // Remove leading ':'
     }
     client->setRealName(realname);
@@ -167,11 +172,14 @@ void CommandHandler::handleUser(Client* client, const std::vector<std::string>& 
     _server->log(logMsg.str(), BLUE);
 
     // Authenticate if password and nickname are already set
-    if (client->getPassword() == _server->_password && !client->getNickname().empty()) {
+    if (client->getPassword() == _server->_password && !client->getNickname().empty())
+	{
         client->authenticate();
         sendWelcomeMessages(client, _server);
         _server->log("Client " + client->getNickname() + " authenticated successfully.", GREEN);
-    } else {
+    }
+	else
+	{
         std::ostringstream authFailMsg;
         authFailMsg << "Client " << client->getFd() << ": USER command failed - authentication conditions not met.";
         _server->log(authFailMsg.str(), RED);
@@ -191,27 +199,22 @@ void CommandHandler::processCommand(Client *client, const std::string &command)
     {
         handlePartCommand(_server, client, command);
     }
-    else if (command.find("NICK") == 0)
+    /*else if (command.find("NICK") == 0)
     {
         handleNickCommand(_server, client, command);
-    }
+    }*/
     else if (command.find("PRIVMSG") == 0)
     {
         handlePrivmsgCommand(_server, client, command);
     }
-    else if (command.find("MODE") == 0)
-    {
-        ModeWhoHandler modeHandler(_server);
-        modeHandler.handleModeCommand(client, command);
-    }
     else if (command.find("WHO") == 0)
     {
-        ModeWhoHandler whoHandler(_server);
+        WhoHandler whoHandler(_server);
         whoHandler.handleWhoCommand(client, command);
     }
 	else if (command.find("WHOIS") == 0)
     {
-        ModeWhoHandler whoHandler(_server);
+        WhoHandler whoHandler(_server);
         whoHandler.handleWhoisCommand(client, command);
     }
 	else if (command.find("PING") == 0)

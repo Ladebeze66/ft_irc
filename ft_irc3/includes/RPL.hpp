@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 15:12:47 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/19 22:27:05 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/21 12:41:51 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,9 @@
 
 #define SERVER_NAME "IRC_Server"
 #define SERVER_VERSION "1.0"
-#define USER_MODES "iw"
-#define CHANNEL_MODES "nt"
-#define CHANNEL_MODES_WITH_PARAMS "kl"
+#define USER_MODES ""
+#define CHANNEL_MODES ""
+#define CHANNEL_MODES_WITH_PARAMS ""
 
 
 
@@ -35,7 +35,7 @@
 // Fonctions pour générer les réponses RPL
 inline std::string RPL_WELCOME(Client* client) {
     std::ostringstream oss;
-    oss << ":" << SERVER_NAME << " 001 " << CLIENT_FD(client)
+    oss << ":" << SERVER_NAME << " 001 " << CLIENT_NICK(client)
         << " :Welcome to the Internet Relay Network " << CLIENT_NICK(client)
         << "!" << CLIENT_USER(client) << "@" << CLIENT_HOST(client) << "\r\n";
     return oss.str();

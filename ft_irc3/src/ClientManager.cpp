@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 18:32:23 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/19 22:09:39 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/21 14:09:07 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,19 +67,22 @@ void ClientManager::handleClient(int client_fd)
     }
 }
 
-void ClientManager::removeClient(int client_fd)
+void ClientManager::removeClient(int clientFd)
 {
-    Client *client = _server->_clients[client_fd];
+    Client* client = _server->_clients[clientFd];
     if (client)
     {
-        std::map<std::string, Channel *>::iterator it = _server->_channels.begin();
+        // Log the nickname being freed
+        _server->log("Removing client: " + client->getNickname(), YELLOW);
+
+        std::map<std::string, Channel*>::iterator it = _server->_channels.begin();
         while (it != _server->_channels.end())
         {
             it->second->removeClient(client);
             if (it->second->isEmpty())
             {
                 delete it->second;
-                std::map<std::string, Channel *>::iterator it_to_delete = it++;
+                std::map<std::string, Channel*>::iterator it_to_delete = it++;
                 _server->_channels.erase(it_to_delete);
             }
             else
@@ -88,13 +91,13 @@ void ClientManager::removeClient(int client_fd)
             }
         }
         delete client;
-        _server->_clients.erase(client_fd);
+        _server->_clients.erase(clientFd);
     }
 
     std::vector<struct pollfd>::iterator it_poll = _server->_poll_fds.begin();
     while (it_poll != _server->_poll_fds.end())
     {
-        if (it_poll->fd == client_fd)
+        if (it_poll->fd == clientFd)
         {
             _server->_poll_fds.erase(it_poll);
             break;
@@ -103,6 +106,7 @@ void ClientManager::removeClient(int client_fd)
     }
 
     std::stringstream ss;
-    ss << "Client disconnected: " << client_fd;
+    ss << "Client disconnected: " << clientFd;
     _server->log(ss.str(), YELLOW);
 }
+

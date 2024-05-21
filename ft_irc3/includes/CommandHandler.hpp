@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 18:14:12 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/19 19:13:53 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/21 13:47:12 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 #include "Client.hpp"
 #include "Channel.hpp"
 #include "AdditionalCommands.hpp"
-#include "ModeWhoHandler.hpp"
+#include "Who.hpp"
 #include "CommandHandler.hpp"
 #include "RPL.hpp"
 
