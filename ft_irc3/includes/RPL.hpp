@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 15:12:47 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/21 12:41:51 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/28 11:20:17 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,10 +71,90 @@ inline std::string RPL_ISUPPORT(Client* client, const std::string& tokens) {
     return oss.str();
 }
 
-inline std::string RPL_MOTDSTART(Client* client) {
+// WHOIS Command RPLs
+inline std::string RPL_WHOISUSER(int clientFd, Client* target)
+{
     std::ostringstream oss;
-    oss << ":" << SERVER_NAME << " 375 " << CLIENT_FD(client)
-        << " :- " << SERVER_NAME << " Message of the day - \r\n";
+    oss << ":" << SERVER_NAME << " 311 " << clientFd << " " << CLIENT_NICK(target) << " "
+        << CLIENT_USER(target) << " " << CLIENT_HOST(target) << " * :" << CLIENT_REALNAME(target) << "\r\n";
+    return oss.str();
+}
+
+inline std::string RPL_WHOISSERVER(int clientFd, const std::string& targetNick, const std::string& serverInfo)
+{
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 312 " << clientFd << " " << targetNick << " " << SERVER_NAME
+        << " :" << serverInfo << "\r\n";
+    return oss.str();
+}
+
+inline std::string RPL_ENDOFWHO(int clientFd, const std::string& channel)
+{
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 315 " << clientFd << " " << channel << " :End of /WHO list.\r\n";
+    return oss.str();
+}
+
+inline std::string RPL_ENDOFWHOIS(int clientFd, const std::string& targetNick)
+{
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 318 " << clientFd << " " << targetNick << " :End of /WHOIS list.\r\n";
+    return oss.str();
+}
+
+// RPL Channel List Messages
+inline std::string RPL_LIST(int clientFd, const std::string& channel, int numVisible, const std::string& topic)
+{
+	std::ostringstream oss;
+	oss << ":" << SERVER_NAME << " 322 " << clientFd << " " << channel << " " << numVisible << " :" << topic << "\r\n";
+	return oss.str();
+}
+
+inline std::string RPL_LISTEND(int clientFd)
+{
+	std::ostringstream oss;
+	oss << ":" << SERVER_NAME << " 323 " << clientFd << " :End of /LIST\r\n";
+	return oss.str();
+}
+
+// RPL Mode Messages
+inline std::string RPL_CHANNELMODEIS(int clientFd, const std::string& channel, const std::string& mode)
+{
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 324 " << clientFd << " " << channel << " " << mode << "\r\n";
+    return oss.str();
+}
+
+inline std::string RPL_TOPIC(Client* client, const std::string& channel, const std::string& topic) {
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 332 " << CLIENT_NICK(client) << " " << channel << " :" << topic << "\r\n";
+    return oss.str();
+}
+
+inline std::string RPL_TOPICWHOTIME(Client* client, const std::string& channel, const std::string& setter, time_t setTime) {
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 333 " << CLIENT_NICK(client) << " " << channel << " " << setter << " " << setTime << "\r\n";
+    return oss.str();
+}
+
+inline std::string RPL_NAMREPLY(Client* client, const std::string& channel, const std::string& users) {
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 353 " << CLIENT_NICK(client) << " = " << channel << " :" << users << "\r\n";
+    return oss.str();
+}
+// WHO Command RPLs
+inline std::string RPL_WHOREPLY(const std::string& channel, Client* target)
+{
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 352 " << CLIENT_NICK(target) << " " << channel << " "
+        << CLIENT_USER(target) << " " << CLIENT_HOST(target) << " " << SERVER_NAME << " "
+        << CLIENT_NICK(target) << " H :0 " << CLIENT_REALNAME(target) << "\r\n";
+    return oss.str();
+}
+
+inline std::string RPL_ENDOFNAMES(Client* client, const std::string& channel) {
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 366 " << CLIENT_NICK(client) << " " << channel << " :End of /NAMES list\r\n";
     return oss.str();
 }
 
@@ -85,10 +165,51 @@ inline std::string RPL_MOTD(Client* client, const std::string& line) {
     return oss.str();
 }
 
+inline std::string RPL_MOTDSTART(Client* client) {
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 375 " << CLIENT_FD(client)
+        << " :- " << SERVER_NAME << " Message of the day - \r\n";
+    return oss.str();
+}
+
 inline std::string RPL_ENDOFMOTD(Client* client) {
     std::ostringstream oss;
     oss << ":" << SERVER_NAME << " 376 " << CLIENT_FD(client)
         << " :End of /MOTD command.\r\n";
+    return oss.str();
+}
+
+inline std::string ERR_NOSUCHNICK(int clientFd, const std::string& nick)
+{
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 401 " << clientFd << " " << nick << " :No such nick/channel\r\n";
+    return oss.str();
+}
+
+inline std::string ERR_NOSUCHCHANNEL(int clientFd, const std::string& channel)
+{
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 403 " << clientFd << " " << channel << " :No such channel\r\n";
+    return oss.str();
+}
+
+inline std::string ERR_TOOMANYCHANNELS(Client* client, const std::string& channel) {
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 405 " << CLIENT_NICK(client) << " " << channel << " :You have joined too many channels\r\n";
+    return oss.str();
+}
+
+// RPL Error Messages
+inline std::string ERR_NOORIGIN(Client* client)
+{
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 409 " << CLIENT_FD(client) << " :No origin specified\r\n";
+    return oss.str();
+}
+
+inline std::string ERR_UNKNOWNCOMMAND(Client* client, const std::string& command) {
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 421 " << CLIENT_NICK(client) << " " << command << " :Unknown command\r\n";
     return oss.str();
 }
 
@@ -99,18 +220,31 @@ inline std::string ERR_NOMOTD(Client* client) {
     return oss.str();
 }
 
-// RPL Channel List Messages
-inline std::string RPL_LIST(Client* client, const std::string& channel, int numVisible, const std::string& topic) {
+inline std::string ERR_NONICKNAMEGIVEN(Client* client)
+{
     std::ostringstream oss;
-    oss << ":" << SERVER_NAME << " 322 " << CLIENT_FD(client) << " " << channel
-        << " " << numVisible << " :" << topic << "\r\n";
+    oss << ":" << SERVER_NAME << " 431 " << CLIENT_FD(client) << " :No nickname given\r\n";
     return oss.str();
 }
 
-inline std::string RPL_LISTEND(Client* client) {
+inline std::string ERR_ERRONEUSNICKNAME(Client* client, const std::string& nickname)
+{
     std::ostringstream oss;
-    oss << ":" << SERVER_NAME << " 323 " << CLIENT_FD(client)
-        << " :End of /LIST\r\n";
+    oss << ":" << SERVER_NAME << " 432 " << CLIENT_FD(client) << " " << nickname << " :Erroneous nickname\r\n";
+    return oss.str();
+}
+
+inline std::string ERR_NICKNAMEINUSE(Client* client, const std::string& nickname)
+{
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 433 " << CLIENT_FD(client) << " " << nickname << " :Nickname is already in use\r\n";
+    return oss.str();
+}
+
+inline std::string ERR_NOTREGISTERED(Client* client)
+{
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 451 " << CLIENT_FD(client) << " :You have not registered\r\n";
     return oss.str();
 }
 
@@ -137,92 +271,33 @@ inline std::string ERR_PASSWDMISMATCH(Client* client)
     return oss.str();
 }
 
-inline std::string ERR_NOTREGISTERED(Client* client)
-{
+inline std::string ERR_CHANNELISFULL(Client* client, const std::string& channel) {
     std::ostringstream oss;
-    oss << ":" << SERVER_NAME << " 451 " << CLIENT_FD(client) << " :You have not registered\r\n";
+    oss << ":" << SERVER_NAME << " 471 " << CLIENT_NICK(client) << " " << channel << " :Cannot join channel (channel is full)\r\n";
     return oss.str();
 }
 
-inline std::string ERR_NONICKNAMEGIVEN(Client* client)
-{
+inline std::string ERR_INVITEONLYCHAN(Client* client, const std::string& channel) {
     std::ostringstream oss;
-    oss << ":" << SERVER_NAME << " 431 " << CLIENT_FD(client) << " :No nickname given\r\n";
+    oss << ":" << SERVER_NAME << " 473 " << CLIENT_NICK(client) << " " << channel << " :Cannot join channel (invite only)\r\n";
     return oss.str();
 }
 
-inline std::string ERR_ERRONEUSNICKNAME(Client* client, const std::string& nickname)
-{
+inline std::string ERR_BANNEDFROMCHAN(Client* client, const std::string& channel) {
     std::ostringstream oss;
-    oss << ":" << SERVER_NAME << " 432 " << CLIENT_FD(client) << " " << nickname << " :Erroneous nickname\r\n";
+    oss << ":" << SERVER_NAME << " 474 " << CLIENT_NICK(client) << " " << channel << " :Cannot join channel (banned)\r\n";
     return oss.str();
 }
 
-inline std::string ERR_NICKNAMEINUSE(Client* client, const std::string& nickname)
-{
+inline std::string ERR_BADCHANNELKEY(Client* client, const std::string& channel) {
     std::ostringstream oss;
-    oss << ":" << SERVER_NAME << " 433 " << CLIENT_FD(client) << " " << nickname << " :Nickname is already in use\r\n";
+    oss << ":" << SERVER_NAME << " 475 " << CLIENT_NICK(client) << " " << channel << " :Cannot join channel (incorrect key)\r\n";
     return oss.str();
 }
 
-// RPL Error Messages
-inline std::string ERR_NOORIGIN(Client* client)
-{
+inline std::string ERR_BADCHANMASK(Client* client, const std::string& channel) {
     std::ostringstream oss;
-    oss << ":" << SERVER_NAME << " 409 " << CLIENT_FD(client) << " :No origin specified\r\n";
-    return oss.str();
-}
-
-// PONG Reply
-inline std::string RPL_PONG(const std::string& token)
-{
-    std::ostringstream oss;
-    oss << ":" << SERVER_NAME << " PONG " << SERVER_NAME << " " << token << "\r\n";
-    return oss.str();
-}
-
-// ERR_UNKNOWNCOMMAND (421)
-inline std::string ERR_UNKNOWNCOMMAND(Client* client, const std::string& command)
-{
-	std::ostringstream oss;
-	oss << ":" << SERVER_NAME << " 421 " << CLIENT_FD(client) << " " << command << " :Unknown command\r\n";
-	return oss.str();
-}
-
-// RPL Channel List Messages
-inline std::string RPL_LIST(int clientFd, const std::string& channel, int numVisible, const std::string& topic)
-{
-	std::ostringstream oss;
-	oss << ":" << SERVER_NAME << " 322 " << clientFd << " " << channel << " " << numVisible << " :" << topic << "\r\n";
-	return oss.str();
-}
-
-inline std::string RPL_LISTEND(int clientFd)
-{
-	std::ostringstream oss;
-	oss << ":" << SERVER_NAME << " 323 " << clientFd << " :End of /LIST\r\n";
-	return oss.str();
-}
-
-inline std::string ERR_NEEDMOREPARAMS(int clientFd, const std::string& command)
-{
-    std::ostringstream oss;
-    oss << ":" << SERVER_NAME << " 461 " << clientFd << " " << command << " :Not enough parameters\r\n";
-    return oss.str();
-}
-
-inline std::string ERR_UNKNOWNCOMMAND(int clientFd, const std::string& command)
-{
-    std::ostringstream oss;
-    oss << ":" << SERVER_NAME << " 421 " << clientFd << " " << command << " :Unknown command\r\n";
-    return oss.str();
-}
-
-// RPL Mode Messages
-inline std::string RPL_CHANNELMODEIS(int clientFd, const std::string& channel, const std::string& mode)
-{
-    std::ostringstream oss;
-    oss << ":" << SERVER_NAME << " 324 " << clientFd << " " << channel << " " << mode << "\r\n";
+    oss << ":" << SERVER_NAME << " 476 " << CLIENT_NICK(client) << " " << channel << " :Bad channel mask\r\n";
     return oss.str();
 }
 
@@ -233,13 +308,6 @@ inline std::string RPL_NOCHANMODES(int clientFd, const std::string& channel)
     return oss.str();
 }
 
-inline std::string ERR_NOSUCHCHANNEL(int clientFd, const std::string& channel)
-{
-    std::ostringstream oss;
-    oss << ":" << SERVER_NAME << " 403 " << clientFd << " " << channel << " :No such channel\r\n";
-    return oss.str();
-}
-
 inline std::string ERR_CHANOPRIVSNEEDED(int clientFd, const std::string& channel)
 {
     std::ostringstream oss;
@@ -247,58 +315,11 @@ inline std::string ERR_CHANOPRIVSNEEDED(int clientFd, const std::string& channel
     return oss.str();
 }
 
-inline std::string ERR_NOSUCHNICK(int clientFd, const std::string& nick)
+// PONG Reply
+inline std::string RPL_PONG(const std::string& token)
 {
     std::ostringstream oss;
-    oss << ":" << SERVER_NAME << " 401 " << clientFd << " " << nick << " :No such nick/channel\r\n";
-    return oss.str();
-}
-
-// WHO Command RPLs
-inline std::string RPL_WHOREPLY(const std::string& channel, Client* target)
-{
-    std::ostringstream oss;
-    oss << ":" << SERVER_NAME << " 352 " << CLIENT_NICK(target) << " " << channel << " "
-        << CLIENT_USER(target) << " " << CLIENT_HOST(target) << " " << SERVER_NAME << " "
-        << CLIENT_NICK(target) << " H :0 " << CLIENT_REALNAME(target) << "\r\n";
-    return oss.str();
-}
-
-inline std::string RPL_ENDOFWHO(int clientFd, const std::string& channel)
-{
-    std::ostringstream oss;
-    oss << ":" << SERVER_NAME << " 315 " << clientFd << " " << channel << " :End of /WHO list.\r\n";
-    return oss.str();
-}
-
-// WHOIS Command RPLs
-inline std::string RPL_WHOISUSER(int clientFd, Client* target)
-{
-    std::ostringstream oss;
-    oss << ":" << SERVER_NAME << " 311 " << clientFd << " " << CLIENT_NICK(target) << " "
-        << CLIENT_USER(target) << " " << CLIENT_HOST(target) << " * :" << CLIENT_REALNAME(target) << "\r\n";
-    return oss.str();
-}
-
-inline std::string RPL_WHOISSERVER(int clientFd, const std::string& targetNick, const std::string& serverInfo)
-{
-    std::ostringstream oss;
-    oss << ":" << SERVER_NAME << " 312 " << clientFd << " " << targetNick << " " << SERVER_NAME
-        << " :" << serverInfo << "\r\n";
-    return oss.str();
-}
-
-inline std::string RPL_ENDOFWHOIS(int clientFd, const std::string& targetNick)
-{
-    std::ostringstream oss;
-    oss << ":" << SERVER_NAME << " 318 " << clientFd << " " << targetNick << " :End of /WHOIS list.\r\n";
-    return oss.str();
-}
-
-inline std::string ERR_NONICKNAMEGIVEN(int clientFd)
-{
-    std::ostringstream oss;
-    oss << ":" << SERVER_NAME << " 431 " << clientFd << " :No nickname given\r\n";
+    oss << ":" << SERVER_NAME << " PONG " << SERVER_NAME << " " << token << "\r\n";
     return oss.str();
 }
 

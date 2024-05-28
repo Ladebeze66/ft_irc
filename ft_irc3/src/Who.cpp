@@ -54,7 +54,7 @@ void WhoHandler::handleWhoisCommand(Client *client, const std::string &command)
 
     if (target.empty())
     {
-        _server->sendToClient(client->getFd(), ERR_NONICKNAMEGIVEN(client->getFd()));
+        _server->sendToClient(client->getFd(), ERR_NONICKNAMEGIVEN(client));
         return;
     }
 

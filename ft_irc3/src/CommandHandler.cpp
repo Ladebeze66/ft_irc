@@ -70,7 +70,7 @@ void CommandHandler::handleCapCommand(Client* client, const std::vector<std::str
 {
     if (tokens.size() < 2)
     {
-        _server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client->getFd(), "CAP"));
+        _server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, "CAP"));
         return;
     }
 
@@ -89,7 +89,7 @@ void CommandHandler::handleCapCommand(Client* client, const std::vector<std::str
     {
         if (tokens.size() < 3)
         {
-            _server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client->getFd(), "CAP"));
+            _server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, "CAP"));
             return;
         }
         std::string requestedCapabilities = tokens[2];
@@ -102,7 +102,7 @@ void CommandHandler::handleCapCommand(Client* client, const std::vector<std::str
     }
     else
     {
-        _server->sendToClient(client->getFd(), ERR_UNKNOWNCOMMAND(client->getFd(), "CAP"));
+        _server->sendToClient(client->getFd(), ERR_UNKNOWNCOMMAND(client, "CAP"));
     }
 }
 
@@ -185,7 +185,7 @@ void CommandHandler::handleNick(Client* client, const std::vector<std::string>& 
 void CommandHandler::handleUser(Client* client, const std::vector<std::string>& tokens)
 {
     if (tokens.size() < 5) {
-        _server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client->getFd(), "USER"));
+        _server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, "USER"));
 
         std::ostringstream oss;
         oss << "Client " << client->getFd() << ": USER command failed - not enough parameters.";
@@ -230,7 +230,7 @@ void CommandHandler::handlePingCommand(Client* client, const std::vector<std::st
 {
     if (tokens.size() < 2)
     {
-        _server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client->getFd(), "PING"));
+        _server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, "PING"));
         return;
     }
 
