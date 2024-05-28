@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 18:30:07 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/21 18:01:47 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/28 14:17:28 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,14 +40,14 @@ class Client;
 class ClientManager
 {
 public:
-    ClientManager(Server *server);
-    void acceptClient();
-    void handleClient(int client_fd);
-    void removeClient(int client_fd);
+	ClientManager(Server *server);
+	void acceptClient();
+	void handleClient(int client_fd);
+	void removeClient(int client_fd);
 
 
 private:
-    Server *_server;
+	Server *_server;
 };
 
 #endif

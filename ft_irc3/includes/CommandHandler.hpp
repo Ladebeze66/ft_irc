@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 18:14:12 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/21 20:15:58 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/28 14:17:40 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,22 +36,22 @@ class AdditionalCommands;
 class CommandHandler
 {
 private:
-    Server *_server;
+	Server *_server;
 	AdditionalCommands *_additionalCommands;
 
 public:
-    CommandHandler(Server *server);
-    bool isValidNickname(const std::string& nickname);
-    bool isNicknameInUse(const std::string& nickname);
-    void handleNick(Client* client, const std::vector<std::string>& tokens);
+	CommandHandler(Server *server);
+	bool isValidNickname(const std::string& nickname);
+	bool isNicknameInUse(const std::string& nickname);
+	void handleNick(Client* client, const std::vector<std::string>& tokens);
 
-    void handleUser(Client* client, const std::vector<std::string>& tokens);
-    void handlePingCommand(Client* client, const std::vector<std::string>& tokens);
-    void handleCommand(Client *client, const std::string &command);
-    void handleCapCommand(Client* client, const std::vector<std::string>& tokens);
-    void handlePassCommand(Client* client, const std::vector<std::string>& tokens);
-    void handleQuitCommand(Client* client, const std::vector<std::string>& tokens);
-    void handleErrorCommand(Client* client, const std::string &message);
+	void handleUser(Client* client, const std::vector<std::string>& tokens);
+	void handlePingCommand(Client* client, const std::vector<std::string>& tokens);
+	void handleCommand(Client *client, const std::string &command);
+	void handleCapCommand(Client* client, const std::vector<std::string>& tokens);
+	void handlePassCommand(Client* client, const std::vector<std::string>& tokens);
+	void handleQuitCommand(Client* client, const std::vector<std::string>& tokens);
+	void handleErrorCommand(Client* client, const std::string &message);
 
 };
 

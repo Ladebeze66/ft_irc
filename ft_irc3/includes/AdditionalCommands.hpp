@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 18:09:05 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/21 19:46:40 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/28 14:16:57 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,15 +34,15 @@ class CommandHandler;
 class AdditionalCommands
 {
 private:
-    Server *_server;
+	Server *_server;
 	CommandHandler *_commandhandler;
 public:
-    AdditionalCommands(Server *server);
-    void processCommand(Client *client, const std::string &command);
-    void broadcastChannelList(Client *client, Server *server);
-    void handlePartCommand(Server *server, Client *client, const std::string &command);
-    void handleNickCommand(Server *server, Client *client, const std::string &command);
-    void handlePrivmsgCommand(Server *server, Client *client, const std::string &command);
+	AdditionalCommands(Server *server);
+	void processCommand(Client *client, const std::string &command);
+	void broadcastChannelList(Client *client, Server *server);
+	void handlePartCommand(Server *server, Client *client, const std::string &command);
+	void handleNickCommand(Server *server, Client *client, const std::string &command);
+	void handlePrivmsgCommand(Server *server, Client *client, const std::string &command);
 };
 
 #endif // ADDITIONALCOMMANDS_HPP
