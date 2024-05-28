@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 15:12:47 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/28 11:20:17 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/28 13:56:19 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,12 @@ inline std::string RPL_ISUPPORT(Client* client, const std::string& tokens) {
     std::ostringstream oss;
     oss << ":" << SERVER_NAME << " 005 " << CLIENT_FD(client)
         << " " << tokens << " :are supported by this server\r\n";
+    return oss.str();
+}
+
+inline std::string RPL_AWAY(int clientFd, const std::string& target, const std::string& message) {
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 301 " << clientFd << " " << target << " :" << message << "\r\n";
     return oss.str();
 }
 
@@ -193,6 +199,12 @@ inline std::string ERR_NOSUCHCHANNEL(int clientFd, const std::string& channel)
     return oss.str();
 }
 
+inline std::string ERR_CANNOTSENDTOCHAN(int clientFd, const std::string& channel) {
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 404 " << clientFd << " " << channel << " :Cannot send to channel\r\n";
+    return oss.str();
+}
+
 inline std::string ERR_TOOMANYCHANNELS(Client* client, const std::string& channel) {
     std::ostringstream oss;
     oss << ":" << SERVER_NAME << " 405 " << CLIENT_NICK(client) << " " << channel << " :You have joined too many channels\r\n";
@@ -204,6 +216,18 @@ inline std::string ERR_NOORIGIN(Client* client)
 {
     std::ostringstream oss;
     oss << ":" << SERVER_NAME << " 409 " << CLIENT_FD(client) << " :No origin specified\r\n";
+    return oss.str();
+}
+
+inline std::string ERR_NORECIPIENT(int clientFd, const std::string& command) {
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 411 " << clientFd << " :No recipient given (" << command << ")\r\n";
+    return oss.str();
+}
+
+inline std::string ERR_NOTEXTTOSEND(int clientFd) {
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 412 " << clientFd << " :No text to send\r\n";
     return oss.str();
 }
 
@@ -238,6 +262,12 @@ inline std::string ERR_NICKNAMEINUSE(Client* client, const std::string& nickname
 {
     std::ostringstream oss;
     oss << ":" << SERVER_NAME << " 433 " << CLIENT_FD(client) << " " << nickname << " :Nickname is already in use\r\n";
+    return oss.str();
+}
+
+inline std::string ERR_NOTONCHANNEL(int clientFd, const std::string& channel) {
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 442 " << clientFd << " " << channel << " :You're not on that channel\r\n";
     return oss.str();
 }
 
@@ -328,14 +358,6 @@ inline std::string RPL_CAP(int clientFd, const std::string& subcommand, const st
 {
     std::ostringstream oss;
     oss << ":" << SERVER_NAME << " CAP " << clientFd << " " << subcommand << " :" << capabilities << "\r\n";
-    return oss.str();
-}
-
-// ERR_NOTREGISTERED
-inline std::string ERR_NOTREGISTERED(int clientFd)
-{
-    std::ostringstream oss;
-    oss << ":" << SERVER_NAME << " 451 " << clientFd << " :You have not registered\r\n";
     return oss.str();
 }
 

@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:15:42 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/21 18:03:09 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/28 14:09:24 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,12 @@ public:
     void authenticate();
     bool isOperator() const;
     void setOperator(bool isOperator);
+    
+    // Ajout des méthodes pour la gestion du statut "away"
+    bool isAway() const;
+    const std::string &getAwayMessage() const;
+    void setAwayMessage(const std::string &message);
+    void setAway(bool away);
 
 private:
     int _fd;
@@ -45,6 +51,9 @@ private:
     std::string _realname;
     bool _authenticated;
     bool _operator;
+    bool _away;
+    std::string _awayMessage;
 };
 
 #endif // CLIENT_HPP
+
