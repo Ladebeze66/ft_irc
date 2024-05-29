@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 18:26:34 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/28 15:30:11 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/29 13:41:25 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ void CommandHandler::handleCommand(Client* client, const std::string& command)
 			_additionalCommands->processCommand(client, command);
 		}
 	}
-	std::cout << "Client " << client->getFd() << " " << client->getNickname() << " " << client->getUser() << " " << client->getPassword() << " " << client->getRealName() << std::endl;
+	//std::cout << "Client " << client->getFd() << " " << client->getNickname() << " " << client->getUser() << " " << client->getPassword() << " " << client->getRealName() << std::endl;
 }
 
 void CommandHandler::handleCapCommand(Client* client, const std::vector<std::string>& tokens)

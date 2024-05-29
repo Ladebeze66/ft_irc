@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/16 15:27:29 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/29 12:16:24 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/29 13:41:49 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,7 +145,7 @@ void AdditionalCommands::handlePrivmsgCommand(Server *server, Client *client, co
             if (channelClients[i] != client)
             {
                 std::stringstream privMsg;
-                privMsg << ":" << client->getNickname() << " PRIVMSG " << target << " :" << message << "\r\n";
+                privMsg << ":" << client->getNickname() << " PRIVMSG " << target << message << "\r\n";
                 server->sendToClient(channelClients[i]->getFd(), privMsg.str());
             }
         }
@@ -158,7 +158,7 @@ void AdditionalCommands::handlePrivmsgCommand(Server *server, Client *client, co
         if (targetClient)
         {
             std::stringstream privMsg;
-            privMsg << ":" << client->getNickname() << " PRIVMSG " << target << " :" << message << "\r\n";
+            privMsg << ":" << client->getNickname() << " PRIVMSG " << target << message << "\r\n";
             server->sendToClient(targetClient->getFd(), privMsg.str());
 
             if (targetClient->isAway()) {
