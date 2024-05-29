@@ -12,9 +12,6 @@
 
 #include "Join.hpp"
 
-#include "Join.hpp"
-
-
 /*void JoinHandler::handleJoinCommand(Client *client, const std::string &channelNames, Server *server)
 {
     if (channelNames.empty()) {
