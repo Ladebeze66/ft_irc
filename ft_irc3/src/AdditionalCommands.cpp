@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/16 15:27:29 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/28 13:56:56 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/29 12:16:24 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ void AdditionalCommands::processCommand(Client *client, const std::string &comma
         _server->log("Message from client " + client->getNickname() + ": " + command, MAGENTA);
     }
 }
+
 
 void AdditionalCommands::broadcastChannelList(Client *client, Server *server)
 {
