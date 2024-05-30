@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:15:13 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/21 19:44:24 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/30 12:20:53 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 #include "CommandHandler.hpp"
 #include "AdditionalCommands.hpp"
 #include "RPL.hpp"
+#include "ModeHandler.hpp"
 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -39,6 +40,7 @@ class Channel;
 class ClientManager;
 class CommandHandler;
 class AdditionalCommands;
+class ModeHandler;
 
 class Server
 {
@@ -55,6 +57,7 @@ public:
 	const std::string &getPassword() const;
 	void broadcast(const std::string &message);
     Client* getClientByName(const std::string &name); // Ajoutez cette méthode
+	Channel* getChannelByName(const std::string &name); // Ajoutez cette méthode
 	void sendChannelListToClient(Client *client);
 	void disconnectClient(int clientFd);
 	bool MatchFd(const pollfd& pfd, int clientFd);
@@ -70,9 +73,11 @@ protected:
     std::vector<struct pollfd> _poll_fds;
     ClientManager *_clientManager;
     CommandHandler *_commandHandler;
+	ModeHandler *_modeHandler;
 
     friend class ClientManager;
     friend class CommandHandler;
+	friend class ModeHandler;
 
 private:
     void initServer();

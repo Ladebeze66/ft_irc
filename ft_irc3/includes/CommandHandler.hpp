@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 18:14:12 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/28 14:17:40 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/30 12:42:22 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 #include "RPL.hpp"
 #include "Join.hpp"
 #include "Welcome.hpp"
+#include "ModeHandler.hpp"
 
 #include <string>
 #include <sstream>
@@ -32,12 +33,15 @@ class Client;
 class Channel;
 class WhoHandler;
 class AdditionalCommands;
+class ModeHandler;
 
 class CommandHandler
 {
 private:
 	Server *_server;
 	AdditionalCommands *_additionalCommands;
+	ModeHandler *_modeHandler;
+
 
 public:
 	CommandHandler(Server *server);

@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:42:57 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/28 13:06:02 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/30 13:09:45 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,4 +116,35 @@ void Channel::setTopic(const std::string &topic, const std::string &setter)
     _topicTime = std::time(NULL);
 }
 
+void Channel::setClientLimit(size_t limit) {
+    _clientLimit = limit;
+}
 
+size_t Channel::getClientLimit() const {
+    return _clientLimit;
+}
+
+void Channel::setInviteOnly(bool inviteOnly) {
+    _inviteOnly = inviteOnly;
+}
+
+void Channel::setKey(const std::string &key) {
+    _key = key;
+}
+
+void Channel::setTopicProtection(bool protection) {
+    _topicProtection = protection;
+}
+
+void Channel::addInvitedClient(Client* client) {
+    _invitedClients.insert(client);
+}
+
+std::string Channel::getModes() const {
+    std::string modes;
+    if (_inviteOnly) modes += 'i';
+    if (!_key.empty()) modes += 'k';
+    if (_clientLimit > 0) modes += 'l';
+    if (_topicProtection) modes += 't';
+    return modes;
+}

@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 18:09:05 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/28 14:16:57 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/30 13:10:51 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 #include "Utils.hpp"
 #include "RPL.hpp"
 #include "Who.hpp"
+#include "InviteHandler.hpp"
 
 #include <sstream>
 #include <string>
@@ -36,6 +37,7 @@ class AdditionalCommands
 private:
 	Server *_server;
 	CommandHandler *_commandhandler;
+	//InviteHandler *_inviteHandler;
 public:
 	AdditionalCommands(Server *server);
 	void processCommand(Client *client, const std::string &command);

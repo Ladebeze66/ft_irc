@@ -6,14 +6,14 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:17:12 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/21 20:31:51 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/30 12:18:40 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 
 Server::Server(int port, const std::string &password)
-	: _port(port), _password(password), _clientManager(new ClientManager(this)), _commandHandler(new CommandHandler(this))
+	: _port(port), _password(password), _clientManager(new ClientManager(this)), _commandHandler(new CommandHandler(this)), _modeHandler(new ModeHandler(this))
 {
 	initServer();
 }
@@ -206,6 +206,14 @@ Client* Server::getClientByName(const std::string &name)
 		}
 	}
 	return NULL; // Remplacez nullptr par NULL
+}
+
+Channel* Server::getChannelByName(const std::string &name) {
+    std::map<std::string, Channel *>::iterator it = _channels.find(name);
+    if (it != _channels.end()) {
+        return it->second;
+    }
+    return NULL;
 }
 
 void Server::sendChannelListToClient(Client *client)

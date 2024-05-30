@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 15:12:47 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/28 15:26:33 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/30 13:27:52 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,9 @@
 
 #define SERVER_NAME "IRC_Server"
 #define SERVER_VERSION "1.0"
-#define USER_MODES ""
-#define CHANNEL_MODES ""
-#define CHANNEL_MODES_WITH_PARAMS ""
+#define USER_MODES "+o"
+#define CHANNEL_MODES "i/t/k/o/l"
+#define CHANNEL_MODES_WITH_PARAMS "None"
 
 
 
@@ -382,6 +382,12 @@ inline std::string ERR_CHANNELISFULL(Client* client, const std::string& channel)
 	std::ostringstream oss;
 	oss << ":" << SERVER_NAME << " 471 " << CLIENT_NICK(client) << " " << channel << " :Cannot join channel (channel is full)\r\n";
 	return oss.str();
+}
+
+inline std::string ERR_UNKNOWNMODE(Client* client, char mode, const std::string& channelName) {
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 472 " << CLIENT_NICK(client) << " " << mode << " :is unknown mode char to me for " << channelName << "\r\n";
+    return oss.str();
 }
 
 inline std::string ERR_INVITEONLYCHAN(Client* client, const std::string& channel) {

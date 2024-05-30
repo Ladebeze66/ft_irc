@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/16 15:27:29 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/29 13:41:49 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/30 13:07:33 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,11 @@ void AdditionalCommands::processCommand(Client *client, const std::string &comma
         WhoHandler whoHandler(_server);
         whoHandler.handleWhoisCommand(client, command);
     }
+	else if (command.find("INVITE") == 0)
+	{
+		InviteHandler inviteHandler(_server);
+		inviteHandler.handleInviteCommand(client, command);
+	}
 	else if (command.find("LIST") == 0)
     {
         broadcastChannelList(client, _server);

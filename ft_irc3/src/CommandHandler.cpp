@@ -6,14 +6,14 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 18:26:34 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/29 13:41:25 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/30 12:39:58 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CommandHandler.hpp"
 
 CommandHandler::CommandHandler(Server *server)
-	: _server(server), _additionalCommands(new AdditionalCommands(server))
+	: _server(server), _additionalCommands(new AdditionalCommands(server)), _modeHandler(new ModeHandler(server))
 	{
 		// Ensure that _server is not null
 		if (!_server)
@@ -50,6 +50,10 @@ void CommandHandler::handleCommand(Client* client, const std::string& command)
 		if (tokens.size() > 1) {
 			handleErrorCommand(client, tokens[1]);
 		}
+	}
+	else if (commandType == "MODE")
+	{
+		_modeHandler->handleModeCommand(client, command);
 	}
 	else if (commandType == "JOIN") {
 		JoinHandler joinHandler;

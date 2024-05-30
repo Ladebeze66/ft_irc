@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:41:35 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/28 14:16:55 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/30 13:09:11 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,14 @@ public:
 	time_t getTopicTime() const;
 	void setTopic(const std::string &topic, const std::string &setter);
 
+	void setClientLimit(size_t limit);        // Ajouté
+    size_t getClientLimit() const;            // Ajouté
+    void setInviteOnly(bool inviteOnly);      // Ajouté
+    void setKey(const std::string &key);      // Ajouté
+    void setTopicProtection(bool protection); // Ajouté
+    std::string getModes() const;             // Ajouté
+	void addInvitedClient(Client* client);
+
 private:
 	std::string _name;
 	std::vector<Client *> _clients;
@@ -65,6 +73,7 @@ private:
 	time_t _topicTime;
 	size_t _clientLimit;
 	bool _inviteOnly;
+	bool _topicProtection; // Ajouté
 };
 
 #endif // CHANNEL_HPP
