@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/30 13:02:09 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/30 13:08:33 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/30 16:53:59 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,23 +26,23 @@ void InviteHandler::handleInviteCommand(Client* client, const std::string& comma
 
     Channel* channel = _server->getChannelByName(channelName);
     if (!channel) {
-        _server->sendToClient(client->getFd(), ERR_NOSUCHCHANNEL(client->getFd(), channelName));
+        _server->sendToClient(client->getFd(), ERR_NOSUCHCHANNEL(client, channelName));
         return;
     }
 
     if (!channel->hasClient(client)) {
-        _server->sendToClient(client->getFd(), ERR_NOTONCHANNEL(client->getFd(), channelName));
+        _server->sendToClient(client->getFd(), ERR_NOTONCHANNEL(client, channelName));
         return;
     }
 
     if (!channel->isOperator(client) && channel->isInviteOnly()) {
-        _server->sendToClient(client->getFd(), ERR_CHANOPRIVSNEEDED(client->getFd(), channelName));
+        _server->sendToClient(client->getFd(), ERR_CHANOPRIVSNEEDED(client, channelName));
         return;
     }
 
     Client* targetClient = _server->getClientByName(nickname);
     if (!targetClient) {
-        _server->sendToClient(client->getFd(), ERR_NOSUCHNICK(client->getFd(), nickname));
+        _server->sendToClient(client->getFd(), ERR_NOSUCHNICK(client, nickname));
         return;
     }
 

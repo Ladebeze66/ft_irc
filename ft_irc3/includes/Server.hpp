@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:15:13 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/30 12:20:53 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/30 17:13:41 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 #include "AdditionalCommands.hpp"
 #include "RPL.hpp"
 #include "ModeHandler.hpp"
+#include "TopicHandler.hpp"
 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -41,6 +42,7 @@ class ClientManager;
 class CommandHandler;
 class AdditionalCommands;
 class ModeHandler;
+class TopicHandler;
 
 class Server
 {
@@ -74,10 +76,12 @@ protected:
     ClientManager *_clientManager;
     CommandHandler *_commandHandler;
 	ModeHandler *_modeHandler;
+	TopicHandler *_topicHandler;
 
     friend class ClientManager;
     friend class CommandHandler;
 	friend class ModeHandler;
+	friend class TopicHandler;
 
 private:
     void initServer();

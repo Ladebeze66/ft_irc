@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 18:09:05 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/30 13:10:51 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/30 17:10:18 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 #include "RPL.hpp"
 #include "Who.hpp"
 #include "InviteHandler.hpp"
+#include "TopicHandler.hpp"
 
 #include <sstream>
 #include <string>

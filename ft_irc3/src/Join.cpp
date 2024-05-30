@@ -113,7 +113,7 @@ void JoinHandler::handleJoinCommand(Client *client, const std::string &channelNa
 
         if (channelName[0] != '#' && channelName[0] != '&')
         {
-            server->sendToClient(client->getFd(), ERR_NOSUCHCHANNEL(client->getFd(), channelName));
+            server->sendToClient(client->getFd(), ERR_NOSUCHCHANNEL(client, channelName));
             return;
         }
 
@@ -191,4 +191,3 @@ std::string JoinHandler::getUsersList(Channel *channel)
     oss << RPL_ENDOFNAMES(clients[0], channel->getName());
 	return oss.str();
 }
-

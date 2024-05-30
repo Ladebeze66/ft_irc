@@ -6,14 +6,14 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:42:57 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/30 13:09:45 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/30 18:33:19 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Channel.hpp"
 
 Channel::Channel(const std::string &name)
-    : _name(name), _clients(), _operators(), _bannedClients(), _invitedClients(), _key(""), _topic(""), _topicSetter(""), _topicTime(0), _clientLimit(50), _inviteOnly(false) {}
+    : _name(name), _clients(), _operators(), _bannedClients(), _invitedClients(), _key(""), _topic(""), _topicSetter(""), _topicTime(0), _clientLimit(50), _inviteOnly(false), _topicProtection(false) {}
 
 Channel::~Channel() {}
 
@@ -50,6 +50,11 @@ void Channel::addOperator(Client *client)
 bool Channel::isOperator(Client *client) const
 {
     return std::find(_operators.begin(), _operators.end(), client) != _operators.end();
+}
+
+void Channel::removeOperator(Client *client)
+{
+	_operators.erase(std::remove(_operators.begin(), _operators.end(), client), _operators.end());
 }
 
 bool Channel::hasClient(Client *client) const
@@ -147,4 +152,9 @@ std::string Channel::getModes() const {
     if (_clientLimit > 0) modes += 'l';
     if (_topicProtection) modes += 't';
     return modes;
+}
+
+bool Channel::getTopicProtection() const
+{
+	return _topicProtection;
 }

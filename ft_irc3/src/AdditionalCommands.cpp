@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/16 15:27:29 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/30 13:07:33 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/30 17:12:30 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,11 @@ void AdditionalCommands::processCommand(Client *client, const std::string &comma
 		InviteHandler inviteHandler(_server);
 		inviteHandler.handleInviteCommand(client, command);
 	}
+	else if (command.find("TOPIC") == 0)
+	{
+		TopicHandler topichandler(_server);
+		topichandler.handleTopicCommand(client, command);
+	}
 	else if (command.find("LIST") == 0)
     {
         broadcastChannelList(client, _server);
@@ -57,9 +62,9 @@ void AdditionalCommands::broadcastChannelList(Client *client, Server *server)
 	std::map<std::string, Channel *> &channels = server->getChannels();
 	for (std::map<std::string, Channel *>::iterator it = channels.begin(); it != channels.end(); ++it)
 	{
-		server->sendToClient(client->getFd(), RPL_LIST(client->getFd(), it->first, it->second->getClients().size(), "Existing channel"));
+		server->sendToClient(client->getFd(), RPL_LIST(client, it->first, it->second->getClients().size(), "Existing channel"));
 	}
-	server->sendToClient(client->getFd(), RPL_LISTEND(client->getFd()));
+	server->sendToClient(client->getFd(), RPL_LISTEND(client));
 }
 
 // Fonction pour gérer la commande PART
@@ -80,13 +85,13 @@ void AdditionalCommands::handlePartCommand(Server *server, Client *client, const
     for (size_t i = 0; i < channels.size(); ++i) {
         std::string &channelName = channels[i];
         if (channelMap.find(channelName) == channelMap.end()) {
-            server->sendToClient(client->getFd(), ERR_NOSUCHCHANNEL(client->getFd(), channelName));
+            server->sendToClient(client->getFd(), ERR_NOSUCHCHANNEL(client, channelName));
             continue;
         }
 
         Channel *channel = channelMap[channelName];
         if (!channel->hasClient(client)) {
-            server->sendToClient(client->getFd(), ERR_NOTONCHANNEL(client->getFd(), channelName));
+            server->sendToClient(client->getFd(), ERR_NOTONCHANNEL(client, channelName));
             continue;
         }
 
@@ -119,12 +124,12 @@ void AdditionalCommands::handlePrivmsgCommand(Server *server, Client *client, co
         message = message.substr(1);
 
     if (target.empty()) {
-        server->sendToClient(client->getFd(), ERR_NORECIPIENT(client->getFd(), "PRIVMSG"));
+        server->sendToClient(client->getFd(), ERR_NORECIPIENT(client, "PRIVMSG"));
         return;
     }
 
     if (message.empty()) {
-        server->sendToClient(client->getFd(), ERR_NOTEXTTOSEND(client->getFd()));
+        server->sendToClient(client->getFd(), ERR_NOTEXTTOSEND(client));
         return;
     }
 
@@ -138,7 +143,7 @@ void AdditionalCommands::handlePrivmsgCommand(Server *server, Client *client, co
 
         // Vérifier les conditions spéciales du canal (ex: ban, modération)
         if (channel->isBanned(client)) {
-            server->sendToClient(client->getFd(), ERR_CANNOTSENDTOCHAN(client->getFd(), target));
+            server->sendToClient(client->getFd(), ERR_CANNOTSENDTOCHAN(client, target));
             return;
         }
 
@@ -167,13 +172,13 @@ void AdditionalCommands::handlePrivmsgCommand(Server *server, Client *client, co
             server->sendToClient(targetClient->getFd(), privMsg.str());
 
             if (targetClient->isAway()) {
-                server->sendToClient(client->getFd(), RPL_AWAY(client->getFd(), targetClient->getNickname(), targetClient->getAwayMessage()));
+                server->sendToClient(client->getFd(), RPL_AWAY(client, targetClient->getNickname(), targetClient->getAwayMessage()));
             }
         }
         else
         {
             // Si la cible n'est ni un canal ni un utilisateur existant, envoyer un message d'erreur
-            server->sendToClient(client->getFd(), ERR_NOSUCHNICK(client->getFd(), target));
+            server->sendToClient(client->getFd(), ERR_NOSUCHNICK(client, target));
         }
     }
 }

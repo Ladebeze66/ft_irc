@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 18:26:34 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/30 12:39:58 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/30 16:53:35 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,11 +83,11 @@ void CommandHandler::handleCapCommand(Client* client, const std::vector<std::str
 
 	if (subcommand == "LS")
 	{
-		_server->sendToClient(client->getFd(), RPL_CAP(client->getFd(), "LS", capabilities));
+		_server->sendToClient(client->getFd(), RPL_CAP(client, "LS", capabilities));
 	}
 	else if (subcommand == "LIST")
 	{
-		_server->sendToClient(client->getFd(), RPL_CAP(client->getFd(), "LIST", capabilities));
+		_server->sendToClient(client->getFd(), RPL_CAP(client, "LIST", capabilities));
 	}
 	else if (subcommand == "REQ")
 	{
@@ -98,11 +98,11 @@ void CommandHandler::handleCapCommand(Client* client, const std::vector<std::str
 		}
 		std::string requestedCapabilities = tokens[2];
 		// For simplicity, we assume all requested capabilities are accepted
-		_server->sendToClient(client->getFd(), RPL_CAP(client->getFd(), "ACK", requestedCapabilities));
+		_server->sendToClient(client->getFd(), RPL_CAP(client, "ACK", requestedCapabilities));
 	}
 	else if (subcommand == "END")
 	{
-		_server->sendToClient(client->getFd(), RPL_CAPEND(client->getFd()));
+		_server->sendToClient(client->getFd(), RPL_CAPEND(client));
 	}
 	else
 	{

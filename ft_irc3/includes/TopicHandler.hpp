@@ -1,33 +1,38 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Join.hpp                                           :+:      :+:    :+:   */
+/*   TopicHandler.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/05/21 19:51:08 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/30 17:48:55 by fgras-ca         ###   ########.fr       */
+/*   Created: 2024/05/30 17:04:33 by fgras-ca          #+#    #+#             */
+/*   Updated: 2024/05/30 17:47:56 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef JOIN_HPP
-#define JOIN_HPP
+#ifndef TOPIC_HANDLER_HPP
+#define TOPIC_HANDLER_HPP
 
 #include <string>
-#include "Client.hpp"
+#include <vector>
+#include <sstream>
 #include "Server.hpp"
+#include "Client.hpp"
 #include "Channel.hpp"
-#include "RPL.hpp"
 #include "Utils.hpp"
 
-class JoinHandler
+
+class TopicHandler
 {
 public:
-	void handleJoinCommand(Client *client, const std::string &channelName, Server *server);
+	TopicHandler(Server* server);
+	void handleTopicCommand(Client* client, const std::string& command);
 
 private:
-	void sendJoinSuccess(Client *client, Channel *channel, Server *server);
-	std::string getUsersList(Channel *channel);
+	void viewTopic(Client* client, Channel* channel);
+	void changeTopic(Client* client, Channel* channel, const std::string& topic);
+
+	Server* _server;
 };
 
-#endif // JOIN_HPP
+#endif

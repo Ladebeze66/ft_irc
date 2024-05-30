@@ -6,14 +6,14 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:17:12 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/30 12:18:40 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/30 17:14:19 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 
 Server::Server(int port, const std::string &password)
-	: _port(port), _password(password), _clientManager(new ClientManager(this)), _commandHandler(new CommandHandler(this)), _modeHandler(new ModeHandler(this))
+	: _port(port), _password(password), _clientManager(new ClientManager(this)), _commandHandler(new CommandHandler(this)), _modeHandler(new ModeHandler(this)), _topicHandler(new TopicHandler(this))
 {
 	initServer();
 }
@@ -164,7 +164,7 @@ void Server::handleServerCommands()
 
 void Server::log(const std::string &message, const std::string &color)
 {
-	std::cout << color << message << "\033[0m" << std::endl;
+	std::cout << color << message << std::endl;
 }
 
 void Server::sendToClient(int client_fd, const std::string &message)
@@ -221,9 +221,9 @@ void Server::sendChannelListToClient(Client *client)
 	std::map<std::string, Channel *> &channels = getChannels();
 	for (std::map<std::string, Channel *>::iterator it = channels.begin(); it != channels.end(); ++it)
 	{
-		sendToClient(client->getFd(), RPL_LIST(client->getFd(), it->first, it->second->getClients().size(), "Existing channel"));
+		sendToClient(client->getFd(), RPL_LIST(client, it->first, it->second->getClients().size(), "Existing channel"));
 	}
-	sendToClient(client->getFd(), RPL_LISTEND(client->getFd()));
+	sendToClient(client->getFd(), RPL_LISTEND(client));
 }
 
 bool Server::MatchFd(const pollfd& pfd, int clientFd)

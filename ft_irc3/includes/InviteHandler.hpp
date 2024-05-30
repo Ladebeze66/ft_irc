@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   InviteHanndler.hpp                                 :+:      :+:    :+:   */
+/*   InviteHandler.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/30 13:01:50 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/30 13:03:04 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/30 17:48:41 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 #include "Client.hpp"
 #include "Channel.hpp"
 #include "RPL.hpp"
+#include "Utils.hpp"
 
 class Server;
 class Client;

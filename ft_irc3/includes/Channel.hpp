@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:41:35 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/30 13:09:11 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/30 18:32:18 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ public:
 	const std::vector<Client *> &getClients() const;
 	void addOperator(Client *client);
 	bool isOperator(Client *client) const;
+	void removeOperator(Client *client);  // Ajouté
 	bool hasClient(Client *client) const;
 	void broadcast(const std::string &message, Client *_client, Server *_server);
 
@@ -59,7 +60,9 @@ public:
     void setKey(const std::string &key);      // Ajouté
     void setTopicProtection(bool protection); // Ajouté
     std::string getModes() const;             // Ajouté
+	bool getTopicProtection() const;
 	void addInvitedClient(Client* client);
+
 
 private:
 	std::string _name;
@@ -74,7 +77,8 @@ private:
 	size_t _clientLimit;
 	bool _inviteOnly;
 	bool _topicProtection; // Ajouté
+
+
 };
 
 #endif // CHANNEL_HPP
-

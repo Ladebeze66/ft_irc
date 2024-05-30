@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 16:09:20 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/28 14:33:29 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/30 16:56:03 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ void WhoHandler::handleWhoCommand(Client *client, const std::string &command)
 		}
 	}
 
-	_server->sendToClient(client->getFd(), RPL_ENDOFWHO(client->getFd(), mask));
+	_server->sendToClient(client->getFd(), RPL_ENDOFWHO(client, mask));
 }
 
 void WhoHandler::handleWhoisCommand(Client *client, const std::string &command)
@@ -61,11 +61,11 @@ void WhoHandler::handleWhoisCommand(Client *client, const std::string &command)
 	Client *targetClient = _server->getClientByName(target);
 	if (!targetClient)
 	{
-		_server->sendToClient(client->getFd(), ERR_NOSUCHNICK(client->getFd(), target));
+		_server->sendToClient(client->getFd(), ERR_NOSUCHNICK(client, target));
 		return;
 	}
 
-	_server->sendToClient(client->getFd(), RPL_WHOISUSER(client->getFd(), targetClient));
-	_server->sendToClient(client->getFd(), RPL_WHOISSERVER(client->getFd(), target, "IRC server info"));
-	_server->sendToClient(client->getFd(), RPL_ENDOFWHOIS(client->getFd(), target));
+	_server->sendToClient(client->getFd(), RPL_WHOISUSER(client, targetClient));
+	_server->sendToClient(client->getFd(), RPL_WHOISSERVER(client, target, "IRC server info"));
+	_server->sendToClient(client->getFd(), RPL_ENDOFWHOIS(client, target));
 }
