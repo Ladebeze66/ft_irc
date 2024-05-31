@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:17:42 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/28 14:32:11 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/31 11:27:52 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,4 +108,14 @@ void Client::setAwayMessage(const std::string &message)
 void Client::setAway(bool away)
 {
 	_away = away;
+}
+
+const std::string &Client::getkey() const
+{
+	return _key;
+}
+
+void Client::setkey(const std::string &key)
+{
+	_key = key;
 }

@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 15:12:47 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/30 17:49:15 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/31 11:18:49 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,9 @@
 
 #define SERVER_NAME "IRC_Server"
 #define SERVER_VERSION "1.0"
-#define USER_MODES "+o/-o"
-#define CHANNEL_MODES "none"
-#define CHANNEL_MODES_WITH_PARAMS "None"
+#define USER_MODES "None"
+#define CHANNEL_MODES "l"
+#define CHANNEL_MODES_WITH_PARAMS "l"
 
 
 
@@ -378,6 +378,12 @@ inline std::string ERR_PASSWDMISMATCH(Client* client)
 	return oss.str();
 }
 
+inline std::string ERR_INVALIDKEY(Client* client, const std::string& channel) {
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 467 " << CLIENT_NICK(client) << " " << channel << " :Invalid key\r\n";
+    return oss.str();
+}
+
 inline std::string ERR_CHANNELISFULL(Client* client, const std::string& channel) {
 	std::ostringstream oss;
 	oss << ":" << SERVER_NAME << " 471 " << CLIENT_NICK(client) << " " << channel << " :Cannot join channel (channel is full)\r\n";
@@ -438,6 +444,12 @@ inline std::string ERR_USERSDONTMATCH(Client *client) {
 	std::ostringstream oss;
 	oss << ":" << SERVER_NAME << " 502 " << CLIENT_NICK(client) << " :Cannot change mode for other users\r\n";
 	return oss.str();
+}
+
+inline std::string ERR_INVALIDMODEPARAM(Client* client, const std::string& param) {
+    std::ostringstream oss;
+    oss << ":" << SERVER_NAME << " 696 " << CLIENT_NICK(client) << " " << param << " :Invalid mode parameter\r\n";
+    return oss.str();
 }
 
 // PONG Reply

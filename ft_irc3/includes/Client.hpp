@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:15:42 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/28 14:17:16 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/31 11:31:54 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,8 @@ public:
 	const std::string &getAwayMessage() const;
 	void setAwayMessage(const std::string &message);
 	void setAway(bool away);
+	const std::string &getkey() const;
+	void setkey(const std::string &key);
 
 private:
 	int _fd;
@@ -53,6 +55,7 @@ private:
 	bool _operator;
 	bool _away;
 	std::string _awayMessage;
+	std::string _key;
 };
 
 #endif // CLIENT_HPP

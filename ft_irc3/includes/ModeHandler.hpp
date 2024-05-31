@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/30 11:12:57 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/30 18:40:48 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/05/31 11:21:04 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ private:
     //void applyModeB(Channel* channel, bool adding, const std::string& argument);
     void applyModeL(Channel* channel, bool adding, const std::string& argument);
     void applyModeI(Channel* channel, bool adding);
-    void applyModeK(Channel* channel, bool adding, const std::string& argument);
+    void applyModeK(Client *client, Channel* channel, bool adding, const std::string& argument);
     void applyModeT(Channel* channel, bool adding);
 	void applyModeO(Client *client, Channel* channel, bool adding, const std::string& argument);
 };
