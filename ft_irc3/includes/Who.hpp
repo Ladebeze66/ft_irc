@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 16:08:48 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/21 18:04:10 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/01 19:03:06 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,16 +23,16 @@
 #include <iostream>
 
 class Server;
-
 class WhoHandler
 {
-public:
-    WhoHandler(Server *server);
-    void handleWhoCommand(Client *client, const std::string &command);
-	void handleWhoisCommand(Client *client, const std::string &command);
+	public:
+		WhoHandler(Server *server);
+		void handleWhoCommand(Client *client, const std::string &command);
+		void handleWhoisCommand(Client *client, const std::string &command);
 
-private:
-    Server *_server;
+	private:
+		Server *_server;
+
 };
 
 #endif

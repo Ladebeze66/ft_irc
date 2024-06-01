@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:17:12 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/30 17:14:19 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/01 19:16:36 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ Server::~Server()
 {
 	delete _clientManager;
 	delete _commandHandler;
+	delete _topicHandler;
 
 	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
@@ -60,14 +61,14 @@ void Server::initServer()
 	if (bind(_server_fd, (struct sockaddr*)&server_addr, sizeof(server_addr)) == -1)
 	{
 		log("Failed to bind socket.", RED);
-		close(_server_fd);  // Close the socket if bind fails
+		close(_server_fd);
 		exit(EXIT_FAILURE);
 	}
 
 	if (listen(_server_fd, SOMAXCONN) == -1)
 	{
 		log("Failed to listen on socket.", RED);
-		close(_server_fd);  // Close the socket if listen fails
+		close(_server_fd);
 		exit(EXIT_FAILURE);
 	}
 
@@ -82,7 +83,6 @@ void Server::run()
 	server_pollfd.revents = 0;
 	_poll_fds.push_back(server_pollfd);
 
-	// Ajout de l'entrée pour les commandes serveur
 	struct pollfd stdin_pollfd;
 	stdin_pollfd.fd = STDIN_FILENO;
 	stdin_pollfd.events = POLLIN;
@@ -180,12 +180,12 @@ void Server::sendToClient(int client_fd, const std::string &message)
 	{
 		std::stringstream ss;
 		ss << "Sent message to client " << client_fd << ": " << message;
-		log(ss.str(), BLUE);
+		log(ss.str(), YELLOW);
 	}
 }
 std::map<int, Client *> &Server::getClients()
 {
-    return _clients;
+	return _clients;
 }
 
 void Server::broadcast(const std::string &message)
@@ -205,15 +205,17 @@ Client* Server::getClientByName(const std::string &name)
 			return it->second;
 		}
 	}
-	return NULL; // Remplacez nullptr par NULL
+	return NULL;
 }
 
-Channel* Server::getChannelByName(const std::string &name) {
-    std::map<std::string, Channel *>::iterator it = _channels.find(name);
-    if (it != _channels.end()) {
-        return it->second;
-    }
-    return NULL;
+Channel* Server::getChannelByName(const std::string &name)
+{
+	std::map<std::string, Channel *>::iterator it = _channels.find(name);
+	if (it != _channels.end())
+	{
+		return it->second;
+	}
+	return NULL;
 }
 
 void Server::sendChannelListToClient(Client *client)

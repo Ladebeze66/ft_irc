@@ -6,14 +6,14 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:17:42 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/31 11:27:52 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/01 19:06:29 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
 
 Client::Client(int fd, const std::string &nickname, const std::string &user, const std::string &host, const std::string &password, const std::string &realname)
-    : _fd(fd), _nickname(nickname), _user(user), _host(host), _password(password), _realname(realname), _authenticated(false), _operator(false), _away(false) {}
+	: _fd(fd), _nickname(nickname), _user(user), _host(host), _password(password), _realname(realname), _authenticated(false), _operator(false), _away(false) {}
 
 int Client::getFd() const
 {
@@ -110,7 +110,7 @@ void Client::setAway(bool away)
 	_away = away;
 }
 
-const std::string &Client::getkey() const
+std::string Client::getKey() const
 {
 	return _key;
 }

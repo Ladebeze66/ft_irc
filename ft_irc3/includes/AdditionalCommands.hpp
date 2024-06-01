@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 18:09:05 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/30 17:10:18 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/01 18:48:32 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,30 +22,27 @@
 #include "Who.hpp"
 #include "InviteHandler.hpp"
 #include "TopicHandler.hpp"
+#include "KickHandler.hpp"
 
 #include <sstream>
 #include <string>
 #include <fstream>
 
-// Forward declarations
 class Server;
 class Client;
 class Channel;
-class CommandHandler;
-
 class AdditionalCommands
 {
-private:
-	Server *_server;
-	CommandHandler *_commandhandler;
-	//InviteHandler *_inviteHandler;
-public:
-	AdditionalCommands(Server *server);
-	void processCommand(Client *client, const std::string &command);
-	void broadcastChannelList(Client *client, Server *server);
-	void handlePartCommand(Server *server, Client *client, const std::string &command);
-	void handleNickCommand(Server *server, Client *client, const std::string &command);
-	void handlePrivmsgCommand(Server *server, Client *client, const std::string &command);
+	private:
+		Server *_server;
+
+	public:
+		AdditionalCommands(Server *server);
+		void processCommand(Client *client, const std::string &command);
+		void broadcastChannelList(Client *client, Server *server);
+		void handlePartCommand(Server *server, Client *client, const std::string &command);
+		void handleNickCommand(Server *server, Client *client, const std::string &command);
+		void handlePrivmsgCommand(Server *server, Client *client, const std::string &command);
 };
 
-#endif // ADDITIONALCOMMANDS_HPP
+#endif

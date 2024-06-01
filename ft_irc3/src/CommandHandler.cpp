@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 18:26:34 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/30 16:53:35 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/01 19:10:48 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,27 +27,40 @@ void CommandHandler::handleCommand(Client* client, const std::string& command)
 {
 	std::vector<std::string> tokens = split(command, " \n\r\t");
 
-	if (tokens.empty()) {
+	if (tokens.empty())
+	{
 		return;
 	}
 
 	std::string commandType = tokens[0];
-	if (commandType == "CAP") {
+	if (commandType == "CAP")
+	{
 		handleCapCommand(client, tokens);
-	} else if (commandType == "PASS") {
+	}
+	else if (commandType == "PASS")
+	{
 		handlePassCommand(client, tokens);
-	} else if (commandType == "NICK") {
+	}
+	else if (commandType == "NICK")
+	{
 		handleNick(client, tokens);
-	} else if (commandType == "USER") {
+	}
+	else if (commandType == "USER")
+	{
 		handleUser(client, tokens);
-	} else if (commandType == "QUIT") {
+	}
+	else if (commandType == "QUIT")
+	{
 		handleQuitCommand(client, tokens);
-	} else if (commandType == "PING")
+	}
+	else if (commandType == "PING")
 	{
 		handlePingCommand(client, tokens);
 	}
-	else if (commandType == "ERROR") {
-		if (tokens.size() > 1) {
+	else if (commandType == "ERROR")
+	{
+		if (tokens.size() > 1)
+		{
 			handleErrorCommand(client, tokens[1]);
 		}
 	}
@@ -55,19 +68,24 @@ void CommandHandler::handleCommand(Client* client, const std::string& command)
 	{
 		_modeHandler->handleModeCommand(client, command);
 	}
-	else if (commandType == "JOIN") {
+	else if (commandType == "JOIN")
+	{
+		std::string joinParams = command.substr(command.find(" ") + 1);
 		JoinHandler joinHandler;
-		joinHandler.handleJoinCommand(client, tokens[1], _server);
+		joinHandler.handleJoinCommand(client, joinParams, _server);
 	}
-	else {
-		if (!client->isAuthenticated()) {
+	else
+	{
+		if (!client->isAuthenticated())
+		{
 			_server->sendToClient(client->getFd(), ERR_NOTREGISTERED(client));
 			_server->log("Client " + client->getNickname() + " attempted to send a command before registering.", RED);
-		} else {
+		}
+		else
+		{
 			_additionalCommands->processCommand(client, command);
 		}
 	}
-	//std::cout << "Client " << client->getFd() << " " << client->getNickname() << " " << client->getUser() << " " << client->getPassword() << " " << client->getRealName() << std::endl;
 }
 
 void CommandHandler::handleCapCommand(Client* client, const std::vector<std::string>& tokens)
@@ -97,7 +115,6 @@ void CommandHandler::handleCapCommand(Client* client, const std::vector<std::str
 			return;
 		}
 		std::string requestedCapabilities = tokens[2];
-		// For simplicity, we assume all requested capabilities are accepted
 		_server->sendToClient(client->getFd(), RPL_CAP(client, "ACK", requestedCapabilities));
 	}
 	else if (subcommand == "END")
@@ -112,31 +129,33 @@ void CommandHandler::handleCapCommand(Client* client, const std::vector<std::str
 
 void CommandHandler::handlePassCommand(Client* client, const std::vector<std::string>& tokens)
 {
-	if (tokens.size() < 2) {
+	if (tokens.size() < 2)
+	{
 		_server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, "PASS"));
 		return;
 	}
 
-	if (client->isAuthenticated()) {
+	if (client->isAuthenticated())
+	{
 		_server->sendToClient(client->getFd(), ERR_ALREADYREGISTERED(client));
 		return;
 	}
 
-	if (tokens[1] == _server->_password) {
+	if (tokens[1] == _server->_password)
+	{
 		client->setPassword(tokens[1]);
 		_server->sendToClient(client->getFd(), ":server NOTICE * :Password accepted\r\n");
 		_server->log("Client " + client->getNickname() + " provided correct password.", GREEN);
 	} else {
 		_server->sendToClient(client->getFd(), ERR_PASSWDMISMATCH(client));
 		_server->log("Client " + client->getNickname() + " failed authentication password.", RED);
-		// Optionally disconnect the client here
 	}
 }
 
 bool CommandHandler::isValidNickname(const std::string& nickname)
 {
-	// Implement nickname validation according to IRC protocol
-	if (nickname.empty() || nickname[0] == '#' || nickname[0] == ':' || nickname.find(' ') != std::string::npos) {
+	if (nickname.empty() || nickname[0] == '#' || nickname[0] == ':' || nickname.find(' ') != std::string::npos)
+	{
 		return false;
 	}
 	return true;
@@ -144,8 +163,10 @@ bool CommandHandler::isValidNickname(const std::string& nickname)
 
 bool CommandHandler::isNicknameInUse(const std::string& nickname)
 {
-	for (std::map<int, Client*>::iterator it = _server->_clients.begin(); it != _server->_clients.end(); ++it) {
-		if (it->second->getNickname() == nickname) {
+	for (std::map<int, Client*>::iterator it = _server->_clients.begin(); it != _server->_clients.end(); ++it)
+	{
+		if (it->second->getNickname() == nickname)
+		{
 			return true;
 		}
 	}
@@ -154,19 +175,22 @@ bool CommandHandler::isNicknameInUse(const std::string& nickname)
 
 void CommandHandler::handleNick(Client* client, const std::vector<std::string>& tokens)
 {
-	if (tokens.size() < 2) {
+	if (tokens.size() < 2)
+	{
 		_server->sendToClient(client->getFd(), ERR_NONICKNAMEGIVEN(client));
 		return;
 	}
 
 	std::string newNick = tokens[1];
 
-	if (!isValidNickname(newNick)) {
+	if (!isValidNickname(newNick))
+	{
 		_server->sendToClient(client->getFd(), ERR_ERRONEUSNICKNAME(client, newNick));
 		return;
 	}
 
-	if (isNicknameInUse(newNick)) {
+	if (isNicknameInUse(newNick))
+	{
 		_server->sendToClient(client->getFd(), ERR_NICKNAMEINUSE(client, newNick));
 		return;
 	}
@@ -174,9 +198,9 @@ void CommandHandler::handleNick(Client* client, const std::vector<std::string>& 
 	std::string oldNick = client->getNickname();
 	client->setNickname(newNick);
 
-	// Envoyer le message NICK à tous les clients connectés
 	std::string nickMessage = ":" + oldNick + " NICK " + newNick + "\r\n";
-	for (std::map<int, Client*>::iterator it = _server->_clients.begin(); it != _server->_clients.end(); ++it) {
+	for (std::map<int, Client*>::iterator it = _server->_clients.begin(); it != _server->_clients.end(); ++it)
+	{
 		_server->sendToClient(it->second->getFd(), nickMessage);
 	}
 
@@ -188,7 +212,8 @@ void CommandHandler::handleNick(Client* client, const std::vector<std::string>& 
 
 void CommandHandler::handleUser(Client* client, const std::vector<std::string>& tokens)
 {
-	if (tokens.size() < 5) {
+	if (tokens.size() < 5)
+	{
 		_server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, "USER"));
 
 		std::ostringstream oss;
@@ -198,7 +223,8 @@ void CommandHandler::handleUser(Client* client, const std::vector<std::string>& 
 		return;
 	}
 
-	if (client->isAuthenticated()) {
+	if (client->isAuthenticated())
+	{
 		_server->sendToClient(client->getFd(), ERR_ALREADYREGISTERED(client));
 
 		std::ostringstream oss;
@@ -209,7 +235,7 @@ void CommandHandler::handleUser(Client* client, const std::vector<std::string>& 
 	}
 
 	std::string username = tokens[1];
-	std::string realname = tokens[4].substr(1); // remove leading ':'
+	std::string realname = tokens[4].substr(1);
 
 	client->setUser(username);
 	client->setRealName(realname);
@@ -218,12 +244,15 @@ void CommandHandler::handleUser(Client* client, const std::vector<std::string>& 
 	oss << "Client " << client->getFd() << ": USER command set username to " << username << " and real name to " << realname;
 	_server->log(oss.str(), BLUE);
 
-	if (client->getPassword() == _server->_password && !client->getNickname().empty()) {
+	if (client->getPassword() == _server->_password && !client->getNickname().empty())
+	{
 		client->authenticate();
 		WelcomeHandler welcomeHandler;
 		welcomeHandler.sendWelcomeMessages(client, _server);
 		_server->log("Client " + client->getNickname() + " authenticated.", GREEN);
-	} else {
+	}
+	else
+	{
 		std::ostringstream oss;
 		oss << "Client " << client->getFd() << ": USER command failed - authentication conditions not met.";
 		_server->log(oss.str(), RED);

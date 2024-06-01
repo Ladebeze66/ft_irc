@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 19:51:08 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/30 17:48:55 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/01 18:51:10 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,15 +19,22 @@
 #include "Channel.hpp"
 #include "RPL.hpp"
 #include "Utils.hpp"
+#include "Server.hpp"
+#include "Channel.hpp"
+#include "Client.hpp"
+
+#include <map>
+#include <vector>
+#include <iostream>
+#include <sstream>
 
 class JoinHandler
 {
-public:
-	void handleJoinCommand(Client *client, const std::string &channelName, Server *server);
+	public:
+		void handleJoinCommand(Client *client, const std::string &channelName, Server *server);
+		void sendJoinSuccess(Client *client, Channel *channel, Server *server);
+		std::string getUsersList(Channel *channel);
 
-private:
-	void sendJoinSuccess(Client *client, Channel *channel, Server *server);
-	std::string getUsersList(Channel *channel);
 };
 
-#endif // JOIN_HPP
+#endif

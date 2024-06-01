@@ -6,16 +6,14 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 18:32:23 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/28 14:32:28 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/01 19:07:39 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ClientManager.hpp"
 
 ClientManager::ClientManager(Server *server)
-	: _server(server)
-{
-}
+	: _server(server) {}
 
 void ClientManager::acceptClient()
 {
@@ -26,7 +24,7 @@ void ClientManager::acceptClient()
 		return;
 	}
 
-	Client *newClient = new Client(client_fd, "", "", "", "", "");   // Fournir six arguments
+	Client *newClient = new Client(client_fd, "", "", "", "", "");
 	_server->_clients[client_fd] = newClient;
 	struct pollfd client_pollfd;
 	client_pollfd.fd = client_fd;
@@ -72,7 +70,6 @@ void ClientManager::handleClient(int client_fd)
 
 	while (std::getline(message_stream, line))
 	{
-		// Remove trailing '\r' and '\n'
 		line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
 		line.erase(std::remove(line.begin(), line.end(), '\n'), line.end());
 
@@ -86,13 +83,11 @@ void ClientManager::handleClient(int client_fd)
 	}
 }
 
-
 void ClientManager::removeClient(int clientFd)
 {
 	Client* client = _server->_clients[clientFd];
 	if (client)
 	{
-		// Log the nickname being freed
 		_server->log("Removing client: " + client->getNickname(), YELLOW);
 
 		std::map<std::string, Channel*>::iterator it = _server->_channels.begin();

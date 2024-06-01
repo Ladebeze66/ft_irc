@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:41:35 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/30 18:32:18 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/01 18:49:53 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,57 +28,53 @@ class Client;
 
 class Channel
 {
-public:
-	Channel(const std::string &name);
-	~Channel();
+	public:
+		Channel(const std::string &name);
+		~Channel();
 
-	const std::string &getName() const;
-	void addClient(Client *client);
-	void removeClient(Client *client);
-	bool isEmpty() const;
-	const std::vector<Client *> &getClients() const;
-	void addOperator(Client *client);
-	bool isOperator(Client *client) const;
-	void removeOperator(Client *client);  // Ajouté
-	bool hasClient(Client *client) const;
-	void broadcast(const std::string &message, Client *_client, Server *_server);
+		const std::string &getName() const;
+		void addClient(Client *client);
+		void removeClient(Client *client);
+		bool isEmpty() const;
+		const std::vector<Client *> &getClients() const;
+		void addOperator(Client *client);
+		bool isOperator(Client *client) const;
+		void removeOperator(Client *client);  // Ajouté
+		bool hasClient(Client *client) const;
+		void broadcast(const std::string &message, Client *_client, Server *_server);
+		bool isBanned(Client *client) const;
+		bool isFull() const;
+		bool isInviteOnly() const;
+		bool isInvited(Client *client) const;
+		bool checkKey(const std::string &key) const;
+		const std::string &getTopic() const;
+		const std::string &getTopicSetter() const;
+		time_t getTopicTime() const;
+		void setTopic(const std::string &topic, const std::string &setter);
 
-	// Ajouts
-	bool isBanned(Client *client) const;
-	bool isFull() const;
-	bool isInviteOnly() const;
-	bool isInvited(Client *client) const;
-	bool checkKey(const std::string &key) const;
-	const std::string &getTopic() const;
-	const std::string &getTopicSetter() const;
-	time_t getTopicTime() const;
-	void setTopic(const std::string &topic, const std::string &setter);
+		void setClientLimit(size_t limit);
+		size_t getClientLimit() const;
+		void setInviteOnly(bool inviteOnly);
+		void setKey(const std::string &key);
+		void setTopicProtection(bool protection);
+		std::string getModes() const;
+		bool getTopicProtection() const;
+		void addInvitedClient(Client* client);
 
-	void setClientLimit(size_t limit);        // Ajouté
-    size_t getClientLimit() const;            // Ajouté
-    void setInviteOnly(bool inviteOnly);      // Ajouté
-    void setKey(const std::string &key);      // Ajouté
-    void setTopicProtection(bool protection); // Ajouté
-    std::string getModes() const;             // Ajouté
-	bool getTopicProtection() const;
-	void addInvitedClient(Client* client);
-
-
-private:
-	std::string _name;
-	std::vector<Client *> _clients;
-	std::vector<Client *> _operators;
-	std::set<Client *> _bannedClients;
-	std::set<Client *> _invitedClients;
-	std::string _key;
-	std::string _topic;
-	std::string _topicSetter;
-	time_t _topicTime;
-	size_t _clientLimit;
-	bool _inviteOnly;
-	bool _topicProtection; // Ajouté
-
+	private:
+		std::string _name;
+		std::vector<Client *> _clients;
+		std::vector<Client *> _operators;
+		std::set<Client *> _bannedClients;
+		std::set<Client *> _invitedClients;
+		std::string _key;
+		std::string _topic;
+		std::string _topicSetter;
+		time_t _topicTime;
+		size_t _clientLimit;
+		bool _inviteOnly;
+		bool _topicProtection;
 
 };
 
-#endif // CHANNEL_HPP
+#endif

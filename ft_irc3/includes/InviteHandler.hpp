@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/30 13:01:50 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/30 17:48:41 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/01 18:51:00 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,13 +27,14 @@ class Server;
 class Client;
 class Channel;
 
-class InviteHandler {
-public:
-    InviteHandler(Server* server);
-    void handleInviteCommand(Client* client, const std::string& command);
+class InviteHandler
+{
+	public:
+		InviteHandler(Server* server);
+		void handleInviteCommand(Client* client, const std::string& command);
 
-private:
-    Server* _server;
+	private:
+		Server* _server;
 };
 
-#endif // INVITEHANDLER_HPP
+#endif
