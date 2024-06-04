@@ -65,7 +65,7 @@ void AdditionalCommands::broadcastChannelList(Client *client, Server *server)
 	std::map<std::string, Channel *> &channels = server->getChannels();
 	for (std::map<std::string, Channel *>::iterator it = channels.begin(); it != channels.end(); ++it)
 	{
-		server->sendToClient(client->getFd(), RPL_LIST(client, it->first, it->second->getClients().size(), "Existing channel"));
+		server->sendToClient(client->getFd(), RPL_LIST(client, it->first, it->second->getClients().size(), it->second->getTopic()));
 	}
 	server->sendToClient(client->getFd(), RPL_LISTEND(client));
 }

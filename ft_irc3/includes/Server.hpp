@@ -59,7 +59,6 @@ class Server
 		void broadcast(const std::string &message);
 		Client* getClientByName(const std::string &name);
 		Channel* getChannelByName(const std::string &name);
-		void sendChannelListToClient(Client *client);
 		void disconnectClient(int clientFd);
 		bool MatchFd(const pollfd& pfd, int clientFd);
 		void removePollFd(int clientFd);

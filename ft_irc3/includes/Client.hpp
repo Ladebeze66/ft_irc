@@ -43,6 +43,9 @@ public:
 	void setAway(bool away);
 	std::string getKey() const;
 	void setkey(const std::string &key);
+	
+	char buffer[1024];
+	char buffer2[1024];
 
 private:
 	int _fd;

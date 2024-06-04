@@ -218,16 +218,6 @@ Channel* Server::getChannelByName(const std::string &name)
 	return NULL;
 }
 
-void Server::sendChannelListToClient(Client *client)
-{
-	std::map<std::string, Channel *> &channels = getChannels();
-	for (std::map<std::string, Channel *>::iterator it = channels.begin(); it != channels.end(); ++it)
-	{
-		sendToClient(client->getFd(), RPL_LIST(client, it->first, it->second->getClients().size(), "Existing channel"));
-	}
-	sendToClient(client->getFd(), RPL_LISTEND(client));
-}
-
 bool Server::MatchFd(const pollfd& pfd, int clientFd)
 {
 	return pfd.fd == clientFd;

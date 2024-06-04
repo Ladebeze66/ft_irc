@@ -201,7 +201,8 @@ void CommandHandler::handleNick(Client* client, const std::vector<std::string>& 
 	std::string nickMessage = ":" + oldNick + " NICK " + newNick + "\r\n";
 	for (std::map<int, Client*>::iterator it = _server->_clients.begin(); it != _server->_clients.end(); ++it)
 	{
-		_server->sendToClient(it->second->getFd(), nickMessage);
+		if (it->second->isAuthenticated())
+			_server->sendToClient(it->second->getFd(), nickMessage);
 	}
 
 	std::ostringstream oss;

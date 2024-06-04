@@ -42,6 +42,7 @@ class ClientManager
 	public:
 		ClientManager(Server *server);
 		void acceptClient();
+		void handleClientNext(int client_fd, char * buffer, int bytes_received);
 		void handleClient(int client_fd);
 		void removeClient(int client_fd);
 
