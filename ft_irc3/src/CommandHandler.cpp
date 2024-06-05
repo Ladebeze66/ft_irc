@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 18:26:34 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/01 19:10:48 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/05 09:57:55 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -201,7 +201,8 @@ void CommandHandler::handleNick(Client* client, const std::vector<std::string>& 
 	std::string nickMessage = ":" + oldNick + " NICK " + newNick + "\r\n";
 	for (std::map<int, Client*>::iterator it = _server->_clients.begin(); it != _server->_clients.end(); ++it)
 	{
-		_server->sendToClient(it->second->getFd(), nickMessage);
+		if (it->second->isAuthenticated())
+			_server->sendToClient(it->second->getFd(), nickMessage);
 	}
 
 	std::ostringstream oss;

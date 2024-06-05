@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/30 11:12:57 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/01 18:52:10 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/04 14:00:47 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ class ModeHandler
 
 		void setChannelMode(Client *client, Channel* channel, const std::string& mode, bool adding, const std::string& argument);
 		void applyModeL(Client *client, Channel* channel, bool adding, const std::string& argument);
-		void applyModeI(Channel* channel, bool adding);
+		void applyModeI(Client *client, Channel* channel, bool adding);
 		void applyModeK(Client *client, Channel* channel, bool adding, const std::string& argument);
 		void applyModeT(Channel* channel, bool adding);
 		void applyModeO(Client *client, Channel* channel, bool adding, const std::string& argument);

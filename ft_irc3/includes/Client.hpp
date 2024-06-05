@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:15:42 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/01 18:47:36 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/05 09:34:30 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,8 @@ public:
 	void setAway(bool away);
 	std::string getKey() const;
 	void setkey(const std::string &key);
+	char buffer[1024];
+	char buffer2[1024];
 
 private:
 	int _fd;

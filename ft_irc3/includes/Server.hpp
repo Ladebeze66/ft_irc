@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:15:13 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/01 19:01:40 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/04 15:03:28 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,6 @@ class Server
 		void broadcast(const std::string &message);
 		Client* getClientByName(const std::string &name);
 		Channel* getChannelByName(const std::string &name);
-		void sendChannelListToClient(Client *client);
 		void disconnectClient(int clientFd);
 		bool MatchFd(const pollfd& pfd, int clientFd);
 		void removePollFd(int clientFd);
@@ -84,9 +83,6 @@ class Server
 	private:
 		void initServer();
 		void handleServerCommands();
-		void acceptClient();
-		void removeClient(int client_fd);
-
 };
 
 #endif

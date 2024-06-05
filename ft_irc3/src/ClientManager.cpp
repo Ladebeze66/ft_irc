@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 18:32:23 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/01 19:07:39 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/05 10:12:30 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,13 @@ void ClientManager::acceptClient()
 
 void ClientManager::handleClient(int client_fd)
 {
-	char buffer[1024];
-	std::memset(buffer, 0, sizeof(buffer));
-	int bytes_received = recv(client_fd, buffer, sizeof(buffer), 0);
-
+	Client* client = _server->getClients()[client_fd];
+	// char buffer[1024];
+	// char buffer2[1024];
+	
+	std::memset(client->buffer, 0, sizeof(client->buffer));
+	int bytes_received = recv(client_fd, client->buffer, sizeof(client->buffer), 0);
+	
 	if (bytes_received <= 0)
 	{
 		std::ostringstream oss;
@@ -51,6 +54,33 @@ void ClientManager::handleClient(int client_fd)
 		return;
 	}
 
+	std::cout << std::string(client->buffer).size() << " client->buffer " << std::string(client->buffer).find('\n') << std::endl;
+
+	for (size_t i = 0; client->buffer[i];i++)
+	{
+		std::cout << client->buffer[i] << " .. ";
+	}
+	std::cout << std::endl;
+
+	if (std::string(client->buffer).find('\n') != std::string::npos)
+	{
+		strcat(client->buffer2, client->buffer);
+		handleClientNext(client_fd, client->buffer2, std::string(client->buffer2).size());
+		std::memset(client->buffer2, 0, std::string(client->buffer2).size());
+	}
+	else
+	{
+		strcat(client->buffer2, client->buffer);
+		for (size_t i = 0; client->buffer2[i];i++)
+		{
+			std::cout << client->buffer2[i] << " . ";
+		}
+	}
+	std::cout << std::endl;
+}
+
+void ClientManager::handleClientNext(int client_fd, char * buffer, int bytes_received)
+{
 	std::string message(buffer, bytes_received);
 	std::ostringstream oss;
 	oss << "Received from client " << client_fd << ": " << message;
