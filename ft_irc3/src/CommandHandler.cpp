@@ -268,9 +268,8 @@ void CommandHandler::handlePingCommand(Client* client, const std::vector<std::st
 		return;
 	}
 
-	std::string serverName = tokens[1];
-	std::string pongMessage = ":" + serverName + " PONG " + serverName + "\r\n";
-	_server->sendToClient(client->getFd(), pongMessage);
+	std::string latence = tokens[1];
+	_server->sendToClient(client->getFd(), RPL_PONG(latence));
 }
 
 

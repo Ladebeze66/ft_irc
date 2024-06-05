@@ -107,6 +107,8 @@ void AdditionalCommands::handlePartCommand(Server *server, Client *client, const
 		partMsg << ":" << client->getNickname() << " PART " << channelName << "\r\n";
 		server->sendToClient(client->getFd(), partMsg.str());
 
+		channel->broadcast(partMsg.str(), client, server);
+
 		if (channel->isEmpty())
 		{
 			delete channel;

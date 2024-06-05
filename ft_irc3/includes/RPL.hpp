@@ -183,10 +183,10 @@ inline std::string RPL_ENDOFINVITELIST(Client *client, const std::string& channe
 	return oss.str();
 }
 
-inline std::string RPL_INVITING(Client* client, const std::string& channel)
+inline std::string RPL_INVITING(Client* client, Client* clientTarget, const std::string& channel)
 {
 	std::ostringstream oss;
-	oss << ":" << SERVER_NAME << " 341 " << CLIENT_NICK(client) << " " << CLIENT_NICK(client) << " " << channel << "\r\n";
+	oss << ":" << SERVER_NAME << " 341 " << CLIENT_NICK(client) << " " << CLIENT_NICK(clientTarget) << " " << channel << "\r\n";
 	return oss.str();
 }
 
@@ -215,7 +215,7 @@ inline std::string RPL_WHOREPLY(const std::string& channel, Client* target)
 {
 	std::ostringstream oss;
 	oss << ":" << SERVER_NAME << " 352 " << CLIENT_NICK(target) << " " << channel << " "
-		<< CLIENT_USER(target) << " " << CLIENT_HOST(target) << " " << SERVER_NAME << " "
+		<< CLIENT_USER(target) << " " << CLIENT_HOST(target) << SERVER_NAME << " "
 		<< CLIENT_NICK(target) << " H :0 " << CLIENT_REALNAME(target) << "\r\n";
 	return oss.str();
 }
@@ -508,7 +508,7 @@ inline std::string ERR_INVALIDMODEPARAM(Client* client, const std::string& param
 inline std::string RPL_PONG(const std::string& token)
 {
 	std::ostringstream oss;
-	oss << ":" << SERVER_NAME << " PONG " << SERVER_NAME << " " << token << "\r\n";
+	oss << ":" << SERVER_NAME << " PONG " << SERVER_NAME << " :" << token << "\r\n";
 	return oss.str();
 }
 

@@ -39,7 +39,7 @@ void InviteHandler::handleInviteCommand(Client* client, const std::string& comma
 		return;
 	}
 
-	if (!channel->isOperator(client) && channel->isInviteOnly())
+	if (!channel->isOperator(client))
 	{
 		_server->sendToClient(client->getFd(), ERR_CHANOPRIVSNEEDED(client, channelName));
 		return;
@@ -59,7 +59,7 @@ void InviteHandler::handleInviteCommand(Client* client, const std::string& comma
 	}
 
 	channel->addInvitedClient(targetClient);
-	_server->sendToClient(client->getFd(), RPL_INVITING(client, channel->getName()));
+	_server->sendToClient(client->getFd(), RPL_INVITING(client, targetClient, channel->getName()));
 
 	std::ostringstream inviteMsg;
 	inviteMsg << ":" << client->getNickname() << " INVITE " << nickname << " " << channelName << "\r\n";
