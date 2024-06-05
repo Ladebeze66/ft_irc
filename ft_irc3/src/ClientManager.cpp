@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 18:32:23 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/01 19:07:39 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/05 10:12:30 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,6 @@ void ClientManager::handleClient(int client_fd)
 	}
 	std::cout << std::endl;
 }
-
 
 void ClientManager::handleClientNext(int client_fd, char * buffer, int bytes_received)
 {

@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 15:12:47 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/01 18:58:37 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/04 16:06:40 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 
 #include "Client.hpp"
 #include "Utils.hpp"
+#include "Channel.hpp"
 
 #define SERVER_NAME "IRC_Server"
 #define SERVER_VERSION "1.0"
@@ -411,6 +412,22 @@ inline std::string ERR_INVALIDKEY(Client* client, const std::string& channel)
 	return oss.str();
 }
 
+inline std::string ERR_KEYSET(Client* client, const std::string& channel)
+{
+	std::ostringstream oss;
+	oss << ":" << SERVER_NAME << " 467 " << CLIENT_NICK(client) << " " << channel
+		<< " :Channel key already set\r\n";
+	return oss.str();
+}
+
+inline std::string ERR_LINKSET(Client* client, const std::string& channel)
+{
+	std::ostringstream oss;
+	oss << ":" << SERVER_NAME << " 469 " << CLIENT_NICK(client) << " " << channel
+		<< " :No key set\r\n";
+	return oss.str();
+}
+
 inline std::string ERR_CHANNELISFULL(Client* client, const std::string& channel)
 {
 	std::ostringstream oss;
@@ -514,6 +531,13 @@ inline std::string RPL_CAPEND(Client *client)
 {
 	std::ostringstream oss;
 	oss << ":" << SERVER_NAME << " CAP " << CLIENT_NICK(client) << " END\r\n";
+	return oss.str();
+}
+
+inline std::string MODEACCEPTMESSAGE(Client *client, std::string channel, const std::string& mode)
+{
+	std::ostringstream oss;
+	oss << ":" << client->getNickname() << " MODE " << channel << " " << mode << " :" << "\r\n";
 	return oss.str();
 }
 

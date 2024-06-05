@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:15:13 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/01 19:01:40 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/04 15:03:28 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,9 +83,6 @@ class Server
 	private:
 		void initServer();
 		void handleServerCommands();
-		void acceptClient();
-		void removeClient(int client_fd);
-
 };
 
 #endif

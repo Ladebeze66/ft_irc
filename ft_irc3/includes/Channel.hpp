@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:41:35 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/01 18:49:53 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/04 16:12:23 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ class Channel
 		const std::string &getTopicSetter() const;
 		time_t getTopicTime() const;
 		void setTopic(const std::string &topic, const std::string &setter);
+		std::string getKey();
 
 		void setClientLimit(size_t limit);
 		size_t getClientLimit() const;

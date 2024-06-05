@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/30 11:13:08 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/01 19:15:05 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/04 16:12:50 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,7 +134,7 @@ void ModeHandler::setChannelMode(Client *client, Channel* channel, const std::st
 		}
 	else if (mode == "i")
 		{
-			applyModeI(channel, adding);
+			applyModeI(client, channel, adding);
 		}
 	else if (mode == "k")
 		{
@@ -171,16 +171,34 @@ void ModeHandler::applyModeL(Client *client, Channel* channel, bool adding, cons
 	}
 }
 
-void ModeHandler::applyModeI(Channel* channel, bool adding)
+void	ModeHandler::applyModeI(Client *client, Channel *channel, bool adding)
 {
-	_server->log("Applying mode I: " + std::string(adding ? "Setting invite-only" : "Removing invite-only"), GREEN);
-	channel->setInviteOnly(adding);
+	std::string	modeChange;
+	bool		isAlreadySet;
+
+	modeChange = adding ? "+i" : "-i";
+	isAlreadySet = channel->isInviteOnly() == adding;
+	if (!isAlreadySet)
+	{
+		_server->sendToClient(client->getFd(), MODEACCEPTMESSAGE(client, channel->getName(), modeChange));
+		_server->log("Applying mode I: " + std::string(adding ? "Setting invite-only" : "Removing invite-only"), GREEN);
+		channel->setInviteOnly(adding);
+	}
 }
 
-void ModeHandler::applyModeK(Client *client, Channel* channel, bool adding, const std::string& argument)
+void	ModeHandler::applyModeK(Client *client, Channel *channel, bool adding, const std::string &argument)
 {
+	bool	isAlreadyProtected;
+
+	isAlreadyProtected = !channel->getKey().empty();
 	if (adding)
 	{
+		if (isAlreadyProtected)
+		{
+			_server->sendToClient(client->getFd(), ERR_KEYSET(client, channel->getName()));
+			_server->log("Mode +k error: Channel already has a key set", RED);
+			return;
+		}
 		if (argument.empty())
 		{
 			_server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, "MODE +k"));
@@ -193,11 +211,19 @@ void ModeHandler::applyModeK(Client *client, Channel* channel, bool adding, cons
 			_server->log("Invalid key for mode +k: contains spaces", RED);
 			return;
 		}
+		_server->sendToClient(client->getFd(), MODEACCEPTMESSAGE(client, channel->getName(), "+k " + argument));
 		_server->log("Applying mode K: Setting key to " + argument, GREEN);
 		channel->setKey(argument);
 	}
 	else
 	{
+		if (!isAlreadyProtected)
+		{
+			_server->sendToClient(client->getFd(), ERR_LINKSET(client, channel->getName()));
+			_server->log("Mode -k error: No key to remove", RED);
+			return;
+		}
+		_server->sendToClient(client->getFd(), MODEACCEPTMESSAGE(client, channel->getName(), "-k"));
 		_server->log("Applying mode K: Removing key", RED);
 		channel->setKey("");
 	}
@@ -205,8 +231,16 @@ void ModeHandler::applyModeK(Client *client, Channel* channel, bool adding, cons
 
 void ModeHandler::applyModeT(Channel* channel, bool adding)
 {
-	_server->log("Applying mode T: " + std::string(adding ? "Setting topic protection" : "Removing topic protection"), GREEN);
-	channel->setTopicProtection(adding);
+	std::string	modeChange;
+	bool		isAlreadySet;
+
+	modeChange = adding ? "+t" : "-t";
+	isAlreadySet = channel->isInviteOnly() == adding;
+	if (!isAlreadySet)
+	{
+		_server->log("Applying mode T: " + std::string(adding ? "Setting topic protection" : "Removing topic protection"), GREEN);
+		channel->setTopicProtection(adding);
+	}
 }
 
 void ModeHandler::applyModeO(Client* client, Channel* channel, bool adding, const std::string& argument)

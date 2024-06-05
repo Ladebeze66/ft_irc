@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:42:57 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/01 19:06:40 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/04 16:12:22 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,6 +139,11 @@ void Channel::setInviteOnly(bool inviteOnly)
 void Channel::setKey(const std::string &key)
 {
 	_key = key;
+}
+
+std::string Channel::getKey()
+{
+	return _key;
 }
 
 void Channel::setTopicProtection(bool protection)
