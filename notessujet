@@ -1,0 +1,321 @@
+FT_IRC
+
+Ce projet consiste à créer votre propre serveur IRC (Internet Relay Chat). Vous utiliserez un client IRC actuel pour vous connecter à votre serveur et le tester. L'Internet est régi par des protocoles de standards solides qui permettent aux ordinateurs connectés de communiquer entre eux. C'est toujours bénéfique de connaître ces protocoles.
+
+Chapitre I - Introduction
+
+L'Internet Relay Chat, ou IRC, est un protocole de communication basé sur le texte sur Internet. Il offre des messageries en temps réel qui peuvent être publiques ou privées. Les utilisateurs peuvent échanger des messages directs et rejoindre des canaux de groupe. Les clients IRC se connectent aux serveurs IRC pour rejoindre ces canaux. Les serveurs IRC sont connectés entre eux pour former un réseau.
+
+ La mise en place d'un serveur IRC implique plusieurs étapes clés que nous pouvons explorer brièvement :
+
+1. Initialisation du serveur
+Création d'un socket serveur : C'est le premier point de contact entre votre serveur et les clients IRC. Vous utilisez la fonction socket() pour créer un socket.
+Liaison du socket : Utilisez la fonction bind() pour associer le socket à une adresse IP et un numéro de port spécifiques.
+Écoute des connexions entrantes : Avec listen(), votre serveur se met à écouter sur le port spécifié, prêt à accepter les connexions client.
+
+2. Gestion des connexions client
+Acceptation des connexions : La fonction accept() permet au serveur d'accepter une connexion entrante d'un client.
+Gestion multithread ou multiplexage : Pour gérer plusieurs clients en même temps, utilisez le multithreading (avec std::thread en C++11 ou plus) ou le multiplexage des entrées/sorties (par exemple, select() ou poll()).
+
+3. Interprétation des commandes IRC
+Réception des messages : Les messages des clients sont reçus en continu. Chaque message doit être analysé pour identifier la commande (par exemple, JOIN, NICK, PRIVMSG).
+Exécution des commandes : En fonction de la commande, le serveur exécutera différentes actions, comme rejoindre un canal ou envoyer un message à un autre utilisateur.
+
+4. Envoi de réponses et de messages
+Formatage des réponses : Les réponses aux commandes doivent être formatées selon les spécifications du protocole IRC, puis envoyées au client concerné.
+Diffusion : Pour les messages comme ceux d’un canal IRC, le serveur doit envoyer le message à tous les utilisateurs présents dans le canal.
+
+5. Gestion des erreurs et de la stabilité
+Traitement des exceptions : Assurez-vous de gérer les exceptions pour éviter que le serveur ne se termine de manière inattendue.
+Surveillance des ressources : Surveillez l'utilisation de la mémoire et les performances pour éviter les dépassements de mémoire et les fuites.
+
+6. Fermeture et nettoyage
+Déconnexion propre : Lorsqu'un client se déconnecte ou lors de la fermeture du serveur, assurez-vous de fermer proprement tous les sockets et de libérer toutes les ressources utilisées.
+Voici un petit exemple de code pour initialiser un socket serveur en C++ :
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <iostream>
+
+int main() {
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0) {
+        std::cerr << "Erreur de création de socket" << std::endl;
+        return 1;
+    }
+
+    sockaddr_in server_addr;
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = INADDR_ANY;
+    server_addr.sin_port = htons(6667); // Port standard pour IRC
+
+    if (bind(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
+        std::cerr << "Erreur de liaison" << std::endl;
+        return 1;
+    }
+
+    listen(sockfd, 5);
+    std::cout << "Serveur IRC en écoute sur le port 6667" << std::endl;
+
+    // Ajouter ici le code pour accepter les connexions et traiter les clients
+
+    return 0;
+}
+
+Chapitre II - Règles générales
+
+Votre programme ne doit pas planter dans aucune circonstance (même en cas de pénurie de mémoire), et ne doit pas se terminer de manière inattendue. Si cela arrive, votre projet sera considéré comme non fonctionnel et votre note sera de 0.
+Vous devez fournir un Makefile qui compilera vos fichiers sources. Ce Makefile ne doit pas recompiler les objets déjà compilés.
+Votre Makefile doit contenir au minimum les règles : $(NAME), all, clean, fclean et re.
+Compilez votre code avec g++ et les drapeaux -Wall -Wextra -Werror.
+Votre code doit être conforme à la norme C++ 98. Il doit toujours être compilable si vous ajoutez le drapeau -std=c++98.
+Essayez d'utiliser le plus possible les fonctionnalités de C++ (par exemple, préférez <cstring> à <string.h>). Vous êtes autorisé à utiliser des fonctions C, mais préférez toujours leurs versions C++ si possible.
+L'utilisation de toute bibliothèque externe et des bibliothèques Boost est interdite.
+
+Chapitre III - Partie Obligatoire
+
+Description du Programme
+Nom du programme : ircserv
+Fichiers à rendre : Makefile, *.{h, hpp}, *.cpp, *.tpp, *.ipp, un fichier de configuration optionnel
+Règles du Makefile : NAME, all, clean, fclean, re
+Arguments du programme :
+
+port : Le port d'écoute pour les connexions entrantes IRC.
+password : Le mot de passe de connexion, nécessaire pour tout client IRC tentant de se connecter au serveur.
+
+Fonctions externes autorisées
+Toutes ces fonctions doivent être utilisées conformément à la norme C++ 98 :
+
+Fonctions de gestion de socket
+Bibliothèque <unistd.h>
+close() : Ferme un descripteur de fichier, donc le socket, libérant toutes les ressources.
+Bibliothèque <sys/socket.h>
+socket() : Crée un point de communication (socket) et renvoie un descripteur de fichier.
+setsockopt() : Configure les options du socket, permettant de modifier son comportement à divers niveaux.
+bind() : Associe une adresse locale à un socket, spécifiant le port et l'adresse IP pour les connexions entrantes.
+connect() : Initie une connexion sur un socket spécifié à une adresse distante.
+listen() : Écoute les connexions sur un socket spécifique.
+accept() : Accepte une connexion entrante sur un socket en écoute, créant un nouveau socket connecté pour cette connexion.
+send() : Envoie des données à la connexion spécifiée par le descripteur de socket.
+recv() : Reçoit des données d'une connexion spécifiée par le descripteur de socket.
+
+Fonctions de manipulation de données réseau
+Bibliothèque <netinet/in.h>
+htons() : Convertit un short (16 bits) de l'ordre des octets de l'hôte à celui du réseau.
+htonl() : Convertit un long (32 bits) de l'ordre des octets de l'hôte à celui du réseau.
+ntohs() : Convertit un short (16 bits) de l'ordre des octets du réseau à celui de l'hôte.
+ntohl() : Convertit un long (32 bits) de l'ordre des octets du réseau à celui de l'hôte.
+Bibliothèque <arpa/inet.h>
+inet_addr() : Convertit une chaîne de caractères représentant une adresse IPv4 en un entier approprié.
+inet_ntoa() : Convertit une adresse IP de sa forme numérique en une chaîne de caractères.
+
+Fonctions de résolution de noms
+Bibliothèque <netdb.h>
+getprotobyname() : Renvoie des informations sur un protocole spécifique (par exemple "tcp") identifié par son nom.
+gethostbyname() : Renvoie des informations sur un hôte, y compris son adresse IP, identifié par son nom.
+getaddrinfo() : Fournit des informations d'adresse pour configurer des connexions socket.
+freeaddrinfo() : Libère la mémoire allouée par getaddrinfo().
+
+Fonctions de signalisation et multiplexage
+Bibliothèque <signal.h>
+signal() : Permet de gérer des signaux, tels que SIGINT, en définissant la fonction appelée lors de la réception d'un signal.
+sigaction() : Permet de gérer des signaux de manière plus précise que signal(), offrant plus de contrôle sur le comportement du signal.
+poll() : Attends un événement sur un ensemble de descripteurs de fichiers, très utile pour gérer plusieurs connexions.
+Bibliothèque <poll.h>
+
+Fonctions de manipulation de fichiers et contrôles
+lseek() : Positionne le descripteur de fichier (par exemple, pour revenir au début d'un fichier).
+Bibliothèque <sys/types.h> et <sys/stat.h>
+fstat() : Obtient les informations d'état d'un fichier ouvert.
+Bibliothèque <fcntl.h>
+fcntl() : Manipule les propriétés d'un fichier ouvert, comme le blocage ou le comportement non-blocant de l'opération.
+Ces fonctions offrent une base solide pour gérer les sockets, les connexions réseau, la conversion d'adresses, la gestion des signaux, et la manipulation basique des fichiers, tous essentiels pour construire un serveur IRC robuste.
+
+(Notez que d'autres fonctions comme select(), epoll() et kqueue() peuvent venir de différentes bibliothèques, notamment <sys/select.h>, <sys/epoll.h> et <sys/event.h> pour kqueue() si vous utilisez un système comme BSD ou macOS.)
+
+Même si pool() est mentionné dans le sujet, vous pouvez utiliser n'importe quel équivalent comme select(), kqueue(), ou epoll().
+
+Exemple de démarrage du serveur IRC
+Voici un exemple de code simplifié montrant comment initialiser un serveur en écoutant sur un port et en utilisant un mot de passe pour authentifier les clients. Ce code est purement illustratif pour vous donner une idée de la structure :
+
+#include <iostream>
+#include <cstring>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
+
+int main(int argc, char* argv[]) {
+    if (argc != 3) {
+        std::cerr << "Usage: ./ircserv <port> <password>" << std::endl;
+        return 1;
+    }
+
+    int port = std::atoi(argv[1]);
+    const char* password = argv[2];
+
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0) {
+        std::cerr << "Could not create socket" << std::endl;
+        return 1;
+    }
+
+    sockaddr_in server_addr;
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = INADDR_ANY;
+    server_addr.sin_port = htons(port);
+
+    if (bind(sockfd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
+        std::cerr << "Bind failed" << std::endl;
+        close(sockfd);
+        return 1;
+    }
+
+    listen(sockfd, 5);
+    std::cout << "Server listening on port " << port << std::endl;
+
+    // Ajout d'une boucle ici pour accepter les connexions et vérifier le mot de passe
+
+    close(sockfd);
+    return 0;
+}
+
+Chapitre III.1 - Exigences de votre serveur IRC
+
+Gestion des clients
+
+Multiclient : Le serveur doit être capable de gérer plusieurs clients simultanément sans jamais se bloquer.
+Opérations non-bloquantes : Toutes les opérations d'entrée/sortie doivent être non-bloquantes. L'utilisation de fork() n'est pas autorisée.
+Utilisation unique de poll() : Seul un appel à poll() (ou équivalent comme select(), epoll()) peut être utilisé pour gérer toutes les opérations (lecture, écriture, écoute, etc.). Bien que les opérations de lecture/écriture puissent être réalisées sans poll() pour rendre les descripteurs de fichiers non-bloquants, cela consommerait plus de ressources système. Si poll() n'est pas utilisé là où nécessaire, la note sera de 0.
+
+Choix et compatibilité du client IRC
+
+Client de référence : Vous devez choisir un client IRC spécifique comme référence, qui sera utilisé pendant le processus d'évaluation pour tester votre serveur.
+Compatibilité : Votre client de référence doit pouvoir se connecter à votre serveur sans rencontrer d'erreurs.
+Communication : La communication entre le client et le serveur doit se faire via TCP/IP (IPv4 ou IPv6).
+
+Fonctionnalités requises
+
+Authentification et gestion de l'utilisateur : Les utilisateurs doivent pouvoir s'authentifier, définir un pseudonyme (nickname), un nom d'utilisateur (username), rejoindre un canal, envoyer et recevoir des messages privés.
+Gestion des canaux : Tous les messages envoyés à un canal doivent être transmis à tous les autres clients présents dans ce canal.
+Utilisateurs et opérateurs : Votre serveur doit distinguer les opérateurs de canal des utilisateurs réguliers.
+
+Commandes spécifiques aux opérateurs de canal :
+KICK : Expulser un client du canal.
+INVITE : Inviter un client à rejoindre un canal.
+TOPIC : Modifier ou afficher le sujet du canal.
+MODE : Changer le mode du canal :
+i : Activer/désactiver le canal sur invitation seulement.
+t : Activer/désactiver les restrictions de la commande TOPIC aux opérateurs de canal.
+k : Définir/supprimer la clé du canal (mot de passe).
+o : Donner/retirer les privilèges d'opérateur de canal.
+l : Définir/supprimer la limite d'utilisateurs dans le canal.
+
+Qualité du code
+
+Code propre : Un code bien organisé, clair et maintenable est attendu.
+
+Conseils de mise en œuvre
+Architecture : Pensez à une architecture modulaire où chaque fonctionnalité (gestion des utilisateurs, gestion des canaux, traitement des commandes) est isolée pour faciliter le développement et la maintenance.
+Tests : Développez des tests unitaires pour chaque composant pour assurer la fiabilité de votre serveur.
+Sécurité : Soyez vigilant avec la gestion de la mémoire et la validation des entrées pour éviter les failles de sécurité.
+Ces exigences définissent clairement les fonctionnalités que votre serveur doit implémenter et comment il doit être conçu pour interagir efficacement avec les clients IRC.
+
+Chapitre III.3 - Exemple de Test
+Objectif du test
+L'objectif de ce test est de vérifier la robustesse de votre serveur IRC en simulant des conditions réseau défavorables telles que la réception de données partielles ou une bande passante limitée. Ce type de test est crucial pour s'assurer que votre serveur peut gérer des situations où les données envoyées par les clients n'arrivent pas en une seule pièce mais plutôt en fragments.
+
+Description du test
+Le test utilise l'outil nc (Netcat), qui est un utilitaire permettant de lire et écrire des données à travers des connexions réseau. Il est utilisé ici pour envoyer des commandes à votre serveur en plusieurs parties, pour simuler un client IRC envoyant des données de manière fragmentée.
+
+Procédure de test
+1.Ouverture de la connexion :
+
+$> nc 127.0.0.1 6667
+
+Cette commande ouvre une connexion TCP sur le port 6667 à l'adresse localhost (127.0.0.1), où votre serveur IRC est censé écouter.
+
+2.Envoi de commandes fragmentées :
+
+Tapez com puis appuyez sur Ctrl+D pour envoyer cette partie de la commande.
+Tapez ensuite man et appuyez de nouveau sur Ctrl+D.
+Enfin, tapez d\n et appuyez une dernière fois sur Ctrl+D pour terminer l'envoi.
+Ctrl+D est utilisé ici pour simuler la fin de l'envoi de données, poussant Netcat à envoyer les données sans fermer la connexion. Cela permet de simuler l'envoi de données en morceaux, comme cela pourrait se produire dans des conditions de réseau réel avec des délais ou des interruptions.
+Traitement des données fragmentées
+Agrégation des paquets : Votre serveur doit être capable de reconstruire la commande complète à partir de ces fragments. Cela signifie que vous devez implémenter une logique pour stocker temporairement les fragments de données reçus jusqu'à ce que la commande soit complètement reçue et prête à être traitée.
+Traitement de la commande : Une fois la commande entièrement reconstituée, votre serveur devrait la traiter comme il le ferait pour toute commande reçue en une seule fois.
+Importance du test
+Ce test est essentiel pour vérifier que votre serveur gère correctement les aspects de la transmission TCP tels que la segmentation des données et les délais de transmission, qui sont des réalités courantes dans les communications sur Internet. Il garantit que les commandes sont correctement reçues et traitées même lorsque les données arrivent en plusieurs morceaux.
+
+Ce type de test est crucial pour assurer la fiabilité et la robustesse de votre serveur dans des conditions réseau réalistes. Il est conseillé de réaliser des tests supplémentaires pour d'autres scénarios d'erreur possibles et de s'assurer que votre serveur est capable de gérer toutes sortes de situations sans planter ou sans perdre de données.
+
+Utilisation de Netcat
+
+Écouter sur un port spécifique
+Pour démarrer Netcat en mode écoute (serveur) sur un port spécifique :
+
+nc -l 1234
+
+Ceci configure Netcat pour écouter sur le port 1234.
+
+Se connecter à un serveur
+Pour utiliser Netcat comme client et se connecter à un serveur :
+
+nc [adresse IP ou nom de domaine] [port]
+
+Par exemple, pour se connecter à un serveur local sur le port 1234 :
+
+nc 127.0.0.1 1234
+
+Transférer un fichier
+Netcat peut être utilisé pour transférer des fichiers entre un serveur et un client.
+
+Sur le serveur (réception) :
+
+nc -l 1234 > fichier_de_sortie.txt
+
+Sur le client (envoi) :
+
+nc [adresse IP du serveur] 1234 < fichier_à_envoyer.txt
+
+Chat simple
+Netcat peut être utilisé pour créer un chat basique en réseau entre deux machines.
+
+Sur la machine A (serveur) :
+
+nc -l 1234
+
+Sur la machine B (client) :
+
+nc [adresse IP de A] 1234
+
+Après ces commandes, chaque texte entré dans la console de Netcat sera envoyé à l'autre partie.
+
+Chapitre IV - Partie Bonus
+
+Si vous avez complété avec succès toutes les exigences obligatoires de votre projet de serveur IRC et que tout fonctionne parfaitement, vous pouvez envisager d'ajouter des fonctionnalités supplémentaires pour enrichir votre serveur. Voici quelques suggestions pour la partie bonus :
+
+1. Gestion du transfert de fichiers
+
+Implémentation de DCC (Direct Client-to-Client) : Le protocole DCC permet aux utilisateurs de votre serveur IRC de transférer des fichiers directement entre eux. Cette fonctionnalité peut être complexe, car elle implique la gestion de connexions peer-to-peer en plus des communications client-serveur habituelles.
+Sécurité et validation : Assurez-vous que le transfert de fichiers est sécurisé et que les fichiers sont correctement validés pour éviter le transfert de malwares.
+
+2. Création d'un bot IRC
+
+Fonctionnalités du bot : Le bot pourrait offrir des services comme la gestion des commandes administratives, la fourniture d'informations en temps réel (météo, nouvelles), des jeux, ou des rappels.
+Interaction avec les utilisateurs : Le bot devrait être capable de répondre aux commandes des utilisateurs et d'effectuer des actions spécifiques basées sur ces commandes.
+Automatisation : Le bot pourrait également surveiller les conversations dans les canaux pour modérer les discussions ou notifier les opérateurs de certains événements.
+
+Points à considérer pour les fonctionnalités bonus
+Intégrité de la partie obligatoire : Avant de vous lancer dans le développement des fonctionnalités bonus, assurez-vous que toutes les fonctionnalités obligatoires sont complètement fonctionnelles et exemptes de bugs. Les fonctionnalités bonus ne seront évaluées que si la partie obligatoire est jugée "parfaite".
+Documentation et tests : Tout comme pour les fonctionnalités obligatoires, documentez bien vos fonctionnalités bonus et assurez-vous qu'elles sont bien testées. Les tests devraient couvrir non seulement les cas d'utilisation normaux mais aussi les cas d'erreur et les limites de performance.
+
+Conseils de développement
+Modularité : Essayez de garder votre code aussi modulaire que possible. Cela vous permettra d'ajouter des fonctionnalités bonus sans perturber le fonctionnement de base de votre serveur.
+Scalabilité : Pensez à la scalabilité de votre serveur avec ces nouvelles fonctionnalités. Assurez-vous que l'ajout de fonctionnalités comme le transfert de fichiers et un bot n'impactera pas négativement la performance générale du serveur.
+Conformité aux standards : Même pour les fonctionnalités bonus, tenez-vous aux standards IRC et aux bonnes pratiques de programmation pour garantir que votre serveur peut interagir correctement avec d'autres clients et serveurs IRC.
+
+Ces fonctionnalités bonus peuvent grandement enrichir l'expérience utilisateur sur votre serveur IRC, le rendant plus attractif et plus utile pour vos utilisateurs.
+
+Dans le cadre de notre projet nous utiliserons hexcat comme reference de client irc.
