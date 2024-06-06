@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/06 11:45:43 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/06 13:37:24 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/06 21:08:25 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,9 @@ bool BotFilter::checkMessage(Client *client, Channel *channel, const std::string
 	if (containsBadWords(message))
 	{
 		warnClient(client, channel);
-		return true;
+		return false;  // Message is not allowed
 	}
-	return false;
+	return true;  // Message is allowed
 }
 
 bool BotFilter::containsBadWords(const std::string &message)
@@ -52,8 +52,7 @@ void BotFilter::warnClient(Client* client, Channel *channel)
 	_warnings[fd] += 1;
 	if (_warnings[fd] >= 3)
 	{
-		_server->sendToClient(fd, BOTMESSAGE(client, channel->getName(), "You have been kicked from the server for inappropriate language.\r\n"));
-		_server->disconnectClient(fd);
+		kickClient(client, channel);
 	}
 	else
 	{
@@ -65,6 +64,7 @@ void BotFilter::warnClient(Client* client, Channel *channel)
 
 void BotFilter::kickClient(Client *client, Channel *channel)
 {
+	channel->banClient(client, channel); // Ensure the client is banned
 	_server->sendToClient(client->getFd(), BOTMESSAGE(client, channel->getName(), "You have been kicked for inappropriate language.\r\n"));
 	_server->disconnectClient(client->getFd());
 }

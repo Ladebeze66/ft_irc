@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:15:13 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/06 12:04:58 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/06 18:51:31 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ class Server
 		void disconnectClient(int clientFd);
 		bool MatchFd(const pollfd& pfd, int clientFd);
 		void removePollFd(int clientFd);
+		BotFilter* getBotFilter() const;
 
 	protected:
 		int _server_fd;

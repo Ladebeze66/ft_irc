@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 18:09:05 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/01 18:48:32 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/06 18:41:04 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 #include "InviteHandler.hpp"
 #include "TopicHandler.hpp"
 #include "KickHandler.hpp"
+#include "BotFilter.hpp"
 
 #include <sstream>
 #include <string>
@@ -31,6 +32,7 @@
 class Server;
 class Client;
 class Channel;
+class BotFilter;
 class AdditionalCommands
 {
 	private:

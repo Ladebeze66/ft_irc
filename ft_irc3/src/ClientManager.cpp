@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 18:32:23 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/06 14:09:52 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/06 19:59:09 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,46 +55,48 @@ void ClientManager::handleClient(int client_fd)
         return;
     }
 
-    std::cout << "Received data (" << bytes_received << " bytes): " << client->buffer << std::endl;
+    std::cout << std::string(client->buffer).size() << " client->buffer " << std::string(client->buffer).find('\n') << std::endl;
+
+    for (size_t i = 0; client->buffer[i]; i++)
+    {
+        std::cout << client->buffer[i] << " .. ";
+    }
+    std::cout << std::endl;
 
     if (std::string(client->buffer).find('\n') != std::string::npos)
     {
         strcat(client->buffer2, client->buffer);
-        std::string fullMessage(client->buffer2);
-
-        // Log the combined message
-        std::cout << "Complete message: " << fullMessage << std::endl;
 
         bool messageAllowed = true;
-
-        if (!client->getChannels().empty())
+        std::set<std::string>::const_iterator it;
+        for (it = client->getChannels().begin(); it != client->getChannels().end(); ++it)
         {
-            for (std::set<std::string>::const_iterator it = client->getChannels().begin(); it != client->getChannels().end(); ++it)
+            const std::string& channelName = *it;
+            Channel* channel = _server->getChannelByName(channelName);
+            if (channel && !_botFilter->checkMessage(client, channel, std::string(client->buffer2)))
             {
-                const std::string& channelName = *it;
-                Channel* channel = _server->getChannelByName(channelName);
-                if (channel && !_botFilter->checkMessage(client, channel, fullMessage))
-                {
-                    messageAllowed = false;
-                    break;
-                }
+                messageAllowed = false;
+                break;
             }
         }
 
         if (messageAllowed)
         {
-            handleClientNext(client_fd, client->buffer2, fullMessage.size());
+            handleClientNext(client_fd, client->buffer2, std::string(client->buffer2).size());
         }
 
-        std::memset(client->buffer2, 0, sizeof(client->buffer2));
+        std::memset(client->buffer2, 0, std::string(client->buffer2).size());
     }
     else
     {
         strcat(client->buffer2, client->buffer);
+        for (size_t i = 0; client->buffer2[i]; i++)
+        {
+            std::cout << client->buffer2[i] << " . ";
+        }
     }
+    std::cout << std::endl;
 }
-
-
 
 void ClientManager::handleClientNext(int client_fd, char * buffer, int bytes_received)
 {

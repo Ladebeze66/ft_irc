@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:42:57 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/04 16:12:22 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/06 21:03:16 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,17 +68,23 @@ void Channel::broadcast(const std::string &message, Client *_client, Server *_se
 	{
 		if (*it != _client)
 		{
-			// Send message to each client except the sender
 			_server->sendToClient((*it)->getFd(), message);
 		}
 	}
 }
 
-bool Channel::isBanned(Client *client) const
+void Channel::banClient(Client *client, Channel *channel)
 {
-	return _bannedClients.find(client) != _bannedClients.end();
+	_bannedClients.insert(client->getFd());
+	removeClient(client);
+	_server->sendToClient(client->getFd(), ERR_BANNEDFROMCHAN(client, channel->_name));
+	_server->log("Client " + client->getNickname() + " Banni", RED);
 }
 
+bool Channel::isBanned(Client *client) const
+{
+	return _bannedClients.find(client->getFd()) != _bannedClients.end();
+}
 bool Channel::isFull() const
 {
 	return _clients.size() >= _clientLimit;

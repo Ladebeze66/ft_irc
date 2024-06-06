@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/16 15:27:29 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/04 13:55:09 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/06 18:41:08 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,7 +124,7 @@ void AdditionalCommands::handlePrivmsgCommand(Server *server, Client *client, co
 	iss >> cmd >> target;
 	getline(iss, message);
 
-	// Enlever le ':' initial dans le message si présent
+	// Remove the initial ':' in the message if present
 	if (!message.empty() && message[0] == ':')
 		message = message.substr(1);
 
@@ -142,6 +142,7 @@ void AdditionalCommands::handlePrivmsgCommand(Server *server, Client *client, co
 
 	std::map<std::string, Channel *> &channels = server->getChannels();
 
+	// Check if the target is a channel
 	if (channels.find(target) != channels.end())
 	{
 		Channel *channel = channels[target];
@@ -152,6 +153,13 @@ void AdditionalCommands::handlePrivmsgCommand(Server *server, Client *client, co
 			return;
 		}
 
+		// Check the message with the bot filter before sending it
+		if (!server->getBotFilter()->checkMessage(client, channel, message))
+		{
+			// If the message is inappropriate, the bot filter will handle warnings or kicks
+			return;
+		}
+
 		std::vector<Client *> channelClients = channel->getClients();
 
 		for (size_t i = 0; i < channelClients.size(); ++i)
@@ -159,7 +167,7 @@ void AdditionalCommands::handlePrivmsgCommand(Server *server, Client *client, co
 			if (channelClients[i] != client)
 			{
 				std::stringstream privMsg;
-				privMsg << ":" << client->getNickname() << " PRIVMSG " << target << message << "\r\n";
+				privMsg << ":" << client->getNickname() << " PRIVMSG " << target << " :" << message << "\r\n";
 				server->sendToClient(channelClients[i]->getFd(), privMsg.str());
 			}
 		}
@@ -170,8 +178,15 @@ void AdditionalCommands::handlePrivmsgCommand(Server *server, Client *client, co
 
 		if (targetClient)
 		{
+			// Check the message with the bot filter before sending it
+			if (!server->getBotFilter()->checkMessage(client, NULL, message))
+			{
+				// If the message is inappropriate, the bot filter will handle warnings or kicks
+				return;
+			}
+
 			std::stringstream privMsg;
-			privMsg << ":" << client->getNickname() << " PRIVMSG " << target << message << "\r\n";
+			privMsg << ":" << client->getNickname() << " PRIVMSG " << target << " :" << message << "\r\n";
 			server->sendToClient(targetClient->getFd(), privMsg.str());
 
 			if (targetClient->isAway())
@@ -181,7 +196,7 @@ void AdditionalCommands::handlePrivmsgCommand(Server *server, Client *client, co
 		}
 		else
 		{
-			// Si la cible n'est ni un canal ni un utilisateur existant, envoyer un message d'erreur
+			// If the target is neither a channel nor an existing user, send an error message
 			server->sendToClient(client->getFd(), ERR_NOSUCHNICK(client, target));
 		}
 	}

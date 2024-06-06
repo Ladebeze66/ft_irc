@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 15:12:47 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/06 12:28:50 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/06 19:36:05 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -541,11 +541,10 @@ inline std::string MODEACCEPTMESSAGE(Client *client, std::string channel, const 
 	return oss.str();
 }
 
-
-inline std::string BOTMESSAGE(Client *client, std::string channel, const std::string& message)
+inline std::string BOTMESSAGE(Client *client, const std::string &channel, const std::string& message)
 {
 	std::ostringstream oss;
-	oss << ":" << client->getNickname() << " WARNING " << channel << " " << message << " :" << "\r\n";
+	oss << ":" << client->getNickname() << " NOTICE " << channel << " :" << message << "\r\n";
 	return oss.str();
 }
 

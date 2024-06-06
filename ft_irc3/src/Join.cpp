@@ -15,19 +15,12 @@
 void JoinHandler::handleJoinCommand(Client* client, const std::string& params, Server* server)
 {
 	std::map<std::string, Channel*>& channels = server->getChannels();
-	Channel* channel;
+	Channel* channel = NULL;
 
 	server->log("Received JOIN command with params: " + params, RED);
 
 	// Split params into channel names and keys
 	std::vector<std::string> parts = split(params, " ");
-	server->log("Split parts: ", RED);
-	for (size_t i = 0; i < parts.size(); ++i)
-	{
-		std::ostringstream oss;
-		oss << "Part " << i << ": " << parts[i];
-		server->log(oss.str(), RED);
-	}
 	if (parts.empty())
 	{
 		server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, "JOIN"));
@@ -37,22 +30,8 @@ void JoinHandler::handleJoinCommand(Client* client, const std::string& params, S
 	std::string channelNames = parts[0];
 	std::string keys = (parts.size() > 1) ? parts[1] : "";
 
-	server->log("Split params: channelNames = " + channelNames + ", keys = " + keys, RED);
-
 	std::vector<std::string> channelList = split(channelNames, ",");
 	std::vector<std::string> keyList = split(keys, ",");
-
-	server->log("channelList: ", RED);
-	for (size_t i = 0; i < channelList.size(); ++i)
-	{
-		server->log(channelList[i], RED);
-	}
-
-	server->log("keyList: ", RED);
-	for (size_t i = 0; i < keyList.size(); ++i)
-	{
-		server->log(keyList[i], RED);
-	}
 
 	for (size_t i = 0; i < channelList.size(); ++i)
 	{
@@ -77,6 +56,17 @@ void JoinHandler::handleJoinCommand(Client* client, const std::string& params, S
 			return;
 		}
 
+		if (channels.find(channelName) != channels.end())
+		{
+			channel = channels[channelName];
+
+			if (channel->isBanned(client))
+			{
+				server->sendToClient(client->getFd(), ERR_BANNEDFROMCHAN(client, channelName));
+				return;
+			}
+		}
+
 		if (channels.find(channelName) == channels.end())
 		{
 			channel = new Channel(channelName);
@@ -88,9 +78,9 @@ void JoinHandler::handleJoinCommand(Client* client, const std::string& params, S
 			channel = channels[channelName];
 		}
 
-		if (channel->isBanned(client))
+		if (channel == NULL)
 		{
-			server->sendToClient(client->getFd(), ERR_BANNEDFROMCHAN(client, channelName));
+			server->log("Channel is NULL after search or creation. This should not happen.", RED);
 			return;
 		}
 
@@ -123,28 +113,28 @@ void JoinHandler::handleJoinCommand(Client* client, const std::string& params, S
 
 void JoinHandler::sendJoinSuccess(Client* client, Channel* channel, Server* server)
 {
-	std::vector<Client*> clients = channel->getClients();
-	for (std::vector<Client*>::iterator it = clients.begin(); it != clients.end(); ++it)
-	{
-		std::string joinMsg = ":" + client->getNickname() + " JOIN " + channel->getName() + "\r\n";
-		server->sendToClient((*it)->getFd(), joinMsg);
-	}
+	// Construct the join message and notify all clients in the channel
+	std::string joinMsg = ":" + client->getNickname() + " JOIN " + channel->getName() + "\r\n";
+	server->sendToClient(client->getFd(), joinMsg);
+	channel->broadcast(joinMsg, client, server);
 
-	if (!channel->getTopic().empty())
-	{
-		server->sendToClient(client->getFd(), RPL_TOPIC(client, channel->getName(), channel->getTopic()));
-		server->sendToClient(client->getFd(), RPL_TOPICWHOTIME(client, channel->getName(), channel->getTopicSetter(), channel->getTopicTime()));
-	}
-	else
+	// Send topic information to the new client
+	if (channel->getTopic().empty())
 	{
 		server->sendToClient(client->getFd(), RPL_NOTOPIC(client, channel->getName()));
 	}
+	else
+	{
+		server->sendToClient(client->getFd(), RPL_TOPIC(client, channel->getName(), channel->getTopic()));
+	}
 
-	std::ostringstream oss;
-	oss << RPL_CHANNELMODEIS(client->getFd(), channel->getName(), channel->getModes());
-	oss << RPL_CREATIONTIME(client, channel->getName(), channel->getTopicTime());
-	server->sendToClient(client->getFd(), oss.str());
+	// Send channel mode and creation time
+	std::string channelModes = RPL_CHANNELMODEIS(client->getFd(), channel->getName(), channel->getModes());
+	std::string channelCreationTime = RPL_CREATIONTIME(client, channel->getName(), channel->getTopicTime());
 
+	server->sendToClient(client->getFd(), channelModes + channelCreationTime);
+
+	// Get the users list and send the names reply
 	std::string usersList = getUsersList(channel);
 	server->sendToClient(client->getFd(), usersList);
 }
@@ -160,6 +150,13 @@ std::string JoinHandler::getUsersList(Channel* channel)
 		users += (*it)->getNickname() + " ";
 	}
 
+	// Remove trailing space
+	if (!users.empty() && users[users.size() - 1] == ' ')
+	{
+		users = users.substr(0, users.size() - 1);
+	}
+
+	// Construct the names reply message
 	std::ostringstream oss;
 	oss << RPL_NAMREPLY(clients[0], channel->getName(), users);
 	oss << RPL_ENDOFNAMES(clients[0], channel->getName());

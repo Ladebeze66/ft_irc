@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/06 11:44:44 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/06 13:41:41 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/06 18:50:12 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,21 +25,24 @@
 #include "Client.hpp"
 #include "Channel.hpp"
 
+class Server;
+class Client;
+class Channel;
 class BotFilter
 {
 public:
-	BotFilter(Server *server);
-	void loadBadWords(const std::string &fileName);
-	bool checkMessage(Client *client, Channel *channel, const std::string &message);
+	BotFilter(Server* server);
+	void loadBadWords(const std::string& fileName);
+	bool checkMessage(Client* client, Channel* channel, const std::string& message);
+	void warnClient(Client* client, Channel* channel);
+	void kickClient(Client* client, Channel* channel);
 
 private:
-	Server *_server;
+	bool containsBadWords(const std::string& message);
+
+	Server* _server;
 	std::vector<std::string> _badWords;
 	std::map<int, int> _warnings;
-
-	bool containsBadWords(const std::string &message);
-	void warnClient(Client *client, Channel *channel);
-	void kickClient(Client *client, Channel *channel);
 };
 
 #endif
