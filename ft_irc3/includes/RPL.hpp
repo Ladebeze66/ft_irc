@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 15:12:47 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/06 19:36:05 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/07 14:00:45 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,6 +106,13 @@ inline std::string RPL_WHOISSERVER(Client *client, const std::string& targetNick
 	return oss.str();
 }
 
+inline std::string RPL_WHOISOPERATOR(Client* client, const std::string& nick)
+{
+	std::ostringstream oss;
+	oss << ":" << SERVER_NAME << " 313 " << CLIENT_NICK(client) << " " << nick << " :is an IRC operator\r\n";
+	return oss.str();
+}
+
 inline std::string RPL_ENDOFWHO(Client *client, const std::string& channel)
 {
 	std::ostringstream oss;
@@ -183,10 +190,10 @@ inline std::string RPL_ENDOFINVITELIST(Client *client, const std::string& channe
 	return oss.str();
 }
 
-inline std::string RPL_INVITING(Client* client, const std::string& channel)
+inline std::string RPL_INVITING(Client* client, Client* clientTarget, const std::string& channel)
 {
 	std::ostringstream oss;
-	oss << ":" << SERVER_NAME << " 341 " << CLIENT_NICK(client) << " " << CLIENT_NICK(client) << " " << channel << "\r\n";
+	oss << ":" << SERVER_NAME << " 341 " << CLIENT_NICK(client) << " " << CLIENT_NICK(clientTarget) << " " << channel << "\r\n";
 	return oss.str();
 }
 
@@ -215,7 +222,7 @@ inline std::string RPL_WHOREPLY(const std::string& channel, Client* target)
 {
 	std::ostringstream oss;
 	oss << ":" << SERVER_NAME << " 352 " << CLIENT_NICK(target) << " " << channel << " "
-		<< CLIENT_USER(target) << " " << CLIENT_HOST(target) << " " << SERVER_NAME << " "
+		<< CLIENT_USER(target) << " " << CLIENT_HOST(target) << SERVER_NAME << " "
 		<< CLIENT_NICK(target) << " H :0 " << CLIENT_REALNAME(target) << "\r\n";
 	return oss.str();
 }
@@ -545,6 +552,13 @@ inline std::string BOTMESSAGE(Client *client, const std::string &channel, const 
 {
 	std::ostringstream oss;
 	oss << ":" << client->getNickname() << " NOTICE " << channel << " :" << message << "\r\n";
+	return oss.str();
+}
+
+inline std::string MODELCHANGE(Client *client, std::string channel, const std::string& mode)
+{
+	std::ostringstream oss;
+	oss << SERVER_NAME <<":" << client->getNickname() << " MODE " << channel << " " << mode << " :" << "\r\n";
 	return oss.str();
 }
 

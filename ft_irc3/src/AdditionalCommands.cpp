@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/16 15:27:29 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/06 18:41:08 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/07 11:34:13 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,6 +106,8 @@ void AdditionalCommands::handlePartCommand(Server *server, Client *client, const
 		std::ostringstream partMsg;
 		partMsg << ":" << client->getNickname() << " PART " << channelName << "\r\n";
 		server->sendToClient(client->getFd(), partMsg.str());
+
+		channel->broadcast(partMsg.str(), client, server);
 
 		if (channel->isEmpty())
 		{

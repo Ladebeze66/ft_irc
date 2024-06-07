@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/30 11:13:08 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/04 16:12:50 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/07 14:10:23 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,23 +104,20 @@ void ModeHandler::handleChannelMode(Client* client, const std::vector<std::strin
 		{
 			adding = true;
 			_server->log("Adding mode: " + std::string(1, mode), GREEN);
-		} else if (mode == '-')
+		}
+		else if (mode == '-')
 		{
 			adding = false;
 			_server->log("Removing mode: " + std::string(1, mode), RED);
-		} else if (mode == 'b' || mode == 'l' || mode == 'i' || mode == 'k' || mode == 't' || mode == 'o')
+		}
+		else
 		{
 			std::string argument;
-			if (argIndex < tokens.size())
+			if (needsArgument(mode) && argIndex < tokens.size())
 			{
 				argument = tokens[argIndex++];
 			}
 			setChannelMode(client, channel, std::string(1, mode), adding, argument);
-		}
-		else
-		{
-			_server->sendToClient(client->getFd(), ERR_UNKNOWNMODE(client, mode, channelName));
-			_server->log("Unknown mode: " + std::string(1, mode), RED);
 		}
 	}
 }
@@ -161,6 +158,7 @@ void ModeHandler::applyModeL(Client *client, Channel* channel, bool adding, cons
 		}
 		std::ostringstream oss;
 		oss << limit;
+		_server->sendToClient(client->getFd(), MODELCHANGE(client, channel->getName(), argument));
 		_server->log("Applying mode L: Setting limit to " + oss.str(), GREEN);
 		channel->setClientLimit(limit);
 	}
@@ -231,15 +229,17 @@ void	ModeHandler::applyModeK(Client *client, Channel *channel, bool adding, cons
 
 void ModeHandler::applyModeT(Channel* channel, bool adding)
 {
-	std::string	modeChange;
-	bool		isAlreadySet;
+	std::string modeChange;
+	bool isAlreadySet;
 
 	modeChange = adding ? "+t" : "-t";
-	isAlreadySet = channel->isInviteOnly() == adding;
+	isAlreadySet = channel->getTopicProtection() == adding;
 	if (!isAlreadySet)
 	{
 		_server->log("Applying mode T: " + std::string(adding ? "Setting topic protection" : "Removing topic protection"), GREEN);
 		channel->setTopicProtection(adding);
+		// Inform the client and channel about the mode change
+		channel->broadcast(MODEACCEPTMESSAGE(NULL, channel->getName(), modeChange), NULL, _server);
 	}
 }
 
@@ -274,4 +274,9 @@ void ModeHandler::applyModeO(Client* client, Channel* channel, bool adding, cons
 		std::string message = ":" + client->getNickname() + " MODE " + channel->getName() + " -o " + targetClient->getNickname() + "\r\n";
 		channel->broadcast(message, NULL, _server);
 	}
+}
+
+bool ModeHandler::needsArgument(char mode)
+{
+	return mode == 'k' || mode == 'l' || mode == 'o';
 }

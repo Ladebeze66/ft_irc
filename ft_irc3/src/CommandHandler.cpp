@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 18:26:34 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/05 09:57:55 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/07 11:32:32 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -268,11 +268,9 @@ void CommandHandler::handlePingCommand(Client* client, const std::vector<std::st
 		return;
 	}
 
-	std::string serverName = tokens[1];
-	std::string pongMessage = ":" + serverName + " PONG " + serverName + "\r\n";
-	_server->sendToClient(client->getFd(), pongMessage);
+	std::string latence = tokens[1];
+	_server->sendToClient(client->getFd(), RPL_PONG(latence));
 }
-
 
 void CommandHandler::handleQuitCommand(Client* client, const std::vector<std::string>& tokens)
 {

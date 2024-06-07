@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/30 13:02:09 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/01 19:11:22 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/07 11:44:34 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ void InviteHandler::handleInviteCommand(Client* client, const std::string& comma
 		return;
 	}
 
-	if (!channel->isOperator(client) && channel->isInviteOnly())
+	if (!channel->isOperator(client))
 	{
 		_server->sendToClient(client->getFd(), ERR_CHANOPRIVSNEEDED(client, channelName));
 		return;
@@ -59,7 +59,7 @@ void InviteHandler::handleInviteCommand(Client* client, const std::string& comma
 	}
 
 	channel->addInvitedClient(targetClient);
-	_server->sendToClient(client->getFd(), RPL_INVITING(client, channel->getName()));
+	_server->sendToClient(client->getFd(), RPL_INVITING(client, targetClient, channel->getName()));
 
 	std::ostringstream inviteMsg;
 	inviteMsg << ":" << client->getNickname() << " INVITE " << nickname << " " << channelName << "\r\n";

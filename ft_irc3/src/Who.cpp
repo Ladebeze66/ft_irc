@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 16:09:20 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/30 16:56:03 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/07 13:43:54 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,4 +68,5 @@ void WhoHandler::handleWhoisCommand(Client *client, const std::string &command)
 	_server->sendToClient(client->getFd(), RPL_WHOISUSER(client, targetClient));
 	_server->sendToClient(client->getFd(), RPL_WHOISSERVER(client, target, "IRC server info"));
 	_server->sendToClient(client->getFd(), RPL_ENDOFWHOIS(client, target));
+	_server->sendToClient(client->getFd(), RPL_WHOISOPERATOR(client, client->getNickname()));
 }
