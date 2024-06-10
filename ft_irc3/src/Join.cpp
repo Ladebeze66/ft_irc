@@ -23,7 +23,7 @@ void JoinHandler::handleJoinCommand(Client* client, const std::string& params, S
 	std::vector<std::string> parts = split(params, " ");
 	if (parts.empty())
 	{
-		server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, "JOIN"));
+		server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, NULL, "JOIN"));
 		return;
 	}
 
@@ -40,7 +40,7 @@ void JoinHandler::handleJoinCommand(Client* client, const std::string& params, S
 
 		if (channelName.empty())
 		{
-			server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, "JOIN"));
+			server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, NULL, "JOIN"));
 			return;
 		}
 
@@ -138,6 +138,7 @@ void JoinHandler::sendJoinSuccess(Client* client, Channel* channel, Server* serv
 	std::string usersList = getUsersList(channel);
 	server->sendToClient(client->getFd(), usersList);
 }
+
 
 std::string JoinHandler::getUsersList(Channel* channel)
 {

@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/30 17:04:58 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/01 19:17:25 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/08 19:17:37 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void TopicHandler::handleTopicCommand(Client* client, const std::string& command
 
 	if (tokens.size() < 2)
 	{
-		_server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, "TOPIC"));
+		_server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, NULL, "TOPIC"));
 		_server->log("TOPIC command error: Need more parameters", RED);
 		return;
 	}

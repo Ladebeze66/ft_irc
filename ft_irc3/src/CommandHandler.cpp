@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 18:26:34 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/07 11:32:32 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/08 19:14:48 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ void CommandHandler::handleCapCommand(Client* client, const std::vector<std::str
 {
 	if (tokens.size() < 2)
 	{
-		_server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, "CAP"));
+		_server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, NULL, "CAP"));
 		return;
 	}
 
@@ -111,7 +111,7 @@ void CommandHandler::handleCapCommand(Client* client, const std::vector<std::str
 	{
 		if (tokens.size() < 3)
 		{
-			_server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, "CAP"));
+			_server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, NULL, "CAP"));
 			return;
 		}
 		std::string requestedCapabilities = tokens[2];
@@ -131,7 +131,7 @@ void CommandHandler::handlePassCommand(Client* client, const std::vector<std::st
 {
 	if (tokens.size() < 2)
 	{
-		_server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, "PASS"));
+		_server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, NULL, "PASS"));
 		return;
 	}
 
@@ -215,7 +215,7 @@ void CommandHandler::handleUser(Client* client, const std::vector<std::string>& 
 {
 	if (tokens.size() < 5)
 	{
-		_server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, "USER"));
+		_server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, NULL, "USER"));
 
 		std::ostringstream oss;
 		oss << "Client " << client->getFd() << ": USER command failed - not enough parameters.";
@@ -264,7 +264,7 @@ void CommandHandler::handlePingCommand(Client* client, const std::vector<std::st
 {
 	if (tokens.size() < 2)
 	{
-		_server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, "PING"));
+		_server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, NULL, "PING"));
 		return;
 	}
 

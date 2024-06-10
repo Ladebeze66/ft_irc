@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/06 11:44:44 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/06 18:50:12 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/10 14:46:42 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ public:
 	void loadBadWords(const std::string& fileName);
 	bool checkMessage(Client* client, Channel* channel, const std::string& message);
 	void warnClient(Client* client, Channel* channel);
+	void warnClientDirect(Client* client);
 	void kickClient(Client* client, Channel* channel);
 
 private:

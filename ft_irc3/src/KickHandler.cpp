@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/01 17:00:31 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/01 19:12:13 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/08 19:16:10 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void KickHandler::handleKickCommand(Client* client, const std::string& command)
 	std::vector<std::string> tokens = split(command, " ");
 	if (tokens.size() < 3)
 	{
-		_server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, "KICK"));
+		_server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, NULL, "KICK"));
 		return;
 	}
 

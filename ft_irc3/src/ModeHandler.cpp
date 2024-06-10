@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/30 11:13:08 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/07 14:10:23 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/08 22:12:20 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void ModeHandler::handleModeCommand(Client* client, const std::string& command)
 
 	if (tokens.size() < 2)
 	{
-		_server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, "MODE"));
+		_server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, NULL, "MODE"));
 		_server->log("MODE command error: Need more parameters", RED);
 		return;
 	}
@@ -139,7 +139,7 @@ void ModeHandler::setChannelMode(Client *client, Channel* channel, const std::st
 		}
 	else if (mode == "t")
 		{
-			applyModeT(channel, adding);
+			applyModeT(client, channel, adding);
 		}
 	else if (mode == "o")
 			applyModeO(client, channel, adding, argument);
@@ -152,18 +152,19 @@ void ModeHandler::applyModeL(Client *client, Channel* channel, bool adding, cons
 		int limit = std::atoi(argument.c_str());
 		if (limit <= 0)
 		{
-			_server->sendToClient(client->getFd(), ERR_INVALIDMODEPARAM(client, argument));
+			_server->sendToClient(client->getFd(), MODELNEEDPARAM("MODE +l"));
 			_server->log("Invalid limit for mode +l: " + argument, RED);
 			return;
 		}
 		std::ostringstream oss;
 		oss << limit;
-		_server->sendToClient(client->getFd(), MODELCHANGE(client, channel->getName(), argument));
+		_server->sendToClient(client->getFd(), MODEACCEPTMESSAGE(client, channel->getName(), "+l", " " + argument));
 		_server->log("Applying mode L: Setting limit to " + oss.str(), GREEN);
 		channel->setClientLimit(limit);
 	}
 	else
 	{
+		_server->sendToClient(client->getFd(), MODEACCEPTMESSAGE(client, channel->getName(), "-l", " " + argument));
 		_server->log("Applying mode L: Removing limit", RED);
 		channel->setClientLimit(0);
 	}
@@ -178,7 +179,7 @@ void	ModeHandler::applyModeI(Client *client, Channel *channel, bool adding)
 	isAlreadySet = channel->isInviteOnly() == adding;
 	if (!isAlreadySet)
 	{
-		_server->sendToClient(client->getFd(), MODEACCEPTMESSAGE(client, channel->getName(), modeChange));
+		_server->sendToClient(client->getFd(), MODEACCEPTMESSAGE(client, channel->getName(), modeChange, ""));
 		_server->log("Applying mode I: " + std::string(adding ? "Setting invite-only" : "Removing invite-only"), GREEN);
 		channel->setInviteOnly(adding);
 	}
@@ -199,7 +200,7 @@ void	ModeHandler::applyModeK(Client *client, Channel *channel, bool adding, cons
 		}
 		if (argument.empty())
 		{
-			_server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, "MODE +k"));
+			_server->sendToClient(client->getFd(), MODELNEEDPARAM("MODE +k"));
 			_server->log("Mode +k error: No key provided", RED);
 			return;
 		}
@@ -209,7 +210,7 @@ void	ModeHandler::applyModeK(Client *client, Channel *channel, bool adding, cons
 			_server->log("Invalid key for mode +k: contains spaces", RED);
 			return;
 		}
-		_server->sendToClient(client->getFd(), MODEACCEPTMESSAGE(client, channel->getName(), "+k " + argument));
+		_server->sendToClient(client->getFd(), MODEACCEPTMESSAGE(client, channel->getName(), "+k ", argument));
 		_server->log("Applying mode K: Setting key to " + argument, GREEN);
 		channel->setKey(argument);
 	}
@@ -221,13 +222,13 @@ void	ModeHandler::applyModeK(Client *client, Channel *channel, bool adding, cons
 			_server->log("Mode -k error: No key to remove", RED);
 			return;
 		}
-		_server->sendToClient(client->getFd(), MODEACCEPTMESSAGE(client, channel->getName(), "-k"));
+		_server->sendToClient(client->getFd(), MODELNEEDPARAM("MODE +k "));
 		_server->log("Applying mode K: Removing key", RED);
 		channel->setKey("");
 	}
 }
 
-void ModeHandler::applyModeT(Channel* channel, bool adding)
+void ModeHandler::applyModeT(Client *client, Channel* channel, bool adding)
 {
 	std::string modeChange;
 	bool isAlreadySet;
@@ -239,7 +240,7 @@ void ModeHandler::applyModeT(Channel* channel, bool adding)
 		_server->log("Applying mode T: " + std::string(adding ? "Setting topic protection" : "Removing topic protection"), GREEN);
 		channel->setTopicProtection(adding);
 		// Inform the client and channel about the mode change
-		channel->broadcast(MODEACCEPTMESSAGE(NULL, channel->getName(), modeChange), NULL, _server);
+		channel->broadcast(MODEACCEPTMESSAGE(client, channel->getName(), modeChange, ""), NULL, _server);
 	}
 }
 

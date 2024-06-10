@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/19 15:12:47 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/07 14:00:45 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/08 20:20:39 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -391,10 +391,10 @@ inline std::string ERR_NOTREGISTERED(Client* client)
 
 //RPL Password
 // RPL Error Messages
-inline std::string ERR_NEEDMOREPARAMS(Client* client, const std::string& command)
+inline std::string ERR_NEEDMOREPARAMS(Client* client, std::string channel, const std::string& command)
 {
 	std::ostringstream oss;
-	oss << ":" << SERVER_NAME << " 461 " << CLIENT_NICK(client) << " " << command << " :Not enough parameters\r\n";
+	oss << ":" << SERVER_NAME << " 461 " << CLIENT_NICK(client) << " " << channel << command << " :Not enough parameters\r\n";
 	return oss.str();
 }
 
@@ -541,10 +541,10 @@ inline std::string RPL_CAPEND(Client *client)
 	return oss.str();
 }
 
-inline std::string MODEACCEPTMESSAGE(Client *client, std::string channel, const std::string& mode)
+inline std::string MODEACCEPTMESSAGE(Client *client, std::string channel, const std::string& mode, const std::string& argument)
 {
 	std::ostringstream oss;
-	oss << ":" << client->getNickname() << " MODE " << channel << " " << mode << " :" << "\r\n";
+	oss << ":" << client->getNickname() << " MODE " << channel << " " << mode << argument << "\r\n";
 	return oss.str();
 }
 
@@ -555,10 +555,10 @@ inline std::string BOTMESSAGE(Client *client, const std::string &channel, const 
 	return oss.str();
 }
 
-inline std::string MODELCHANGE(Client *client, std::string channel, const std::string& mode)
+inline std::string MODELNEEDPARAM(const std::string& mode)
 {
 	std::ostringstream oss;
-	oss << SERVER_NAME <<":" << client->getNickname() << " MODE " << channel << " " << mode << " :" << "\r\n";
+	oss << mode << ":NOT enought parameters" << "\r\n";
 	return oss.str();
 }
 

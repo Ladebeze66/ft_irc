@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/30 13:02:09 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/07 11:44:34 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/08 19:15:29 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void InviteHandler::handleInviteCommand(Client* client, const std::string& comma
 
 	if (nickname.empty() || channelName.empty())
 	{
-		_server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, "INVITE"));
+		_server->sendToClient(client->getFd(), ERR_NEEDMOREPARAMS(client, NULL, "INVITE"));
 		return;
 	}
 
