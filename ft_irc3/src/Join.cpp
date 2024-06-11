@@ -46,6 +46,27 @@ void JoinHandler::handleJoinCommand(Client* client, const std::string& params, S
 
 		if (channelName[0] == '0' && channelName.size() == 1)
 		{
+			std::cout << "leave all -----------" << std::endl;
+			std::map<std::string, Channel *> & channels = server->getChannels();
+			for (std::map<std::string, Channel *>::iterator it = channels.begin(); it != channels.end(); ++it)
+			{
+				// std::cout << it->second->getName() << std::endl;
+				if (it->second->hasClient(client))
+				{
+					it->second->removeClient(client);
+					if (it->second->isEmpty())
+					{
+						delete it->second;
+					}
+
+					std::ostringstream partMsg;
+					partMsg << ":" << client->getNickname() << " PART " << it->first << " Leaving" << "\r\n";
+					server->sendToClient(client->getFd(), partMsg.str());
+
+					it->second->broadcast(partMsg.str(), client, server);
+				}
+			}
+			// Leave all channels
 			return;
 		}
 
