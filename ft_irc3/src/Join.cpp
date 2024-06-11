@@ -46,7 +46,6 @@ void JoinHandler::handleJoinCommand(Client* client, const std::string& params, S
 
 		if (channelName[0] == '0' && channelName.size() == 1)
 		{
-			// Leave all channels
 			return;
 		}
 

@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/30 11:13:08 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/08 22:12:20 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/11 11:27:28 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,13 +158,13 @@ void ModeHandler::applyModeL(Client *client, Channel* channel, bool adding, cons
 		}
 		std::ostringstream oss;
 		oss << limit;
-		_server->sendToClient(client->getFd(), MODEACCEPTMESSAGE(client, channel->getName(), "+l", " " + argument));
+		channel->broadcast(MODEACCEPTMESSAGE(client, channel->getName(), "+l", "" + argument), NULL, _server);
 		_server->log("Applying mode L: Setting limit to " + oss.str(), GREEN);
 		channel->setClientLimit(limit);
 	}
 	else
 	{
-		_server->sendToClient(client->getFd(), MODEACCEPTMESSAGE(client, channel->getName(), "-l", " " + argument));
+		channel->broadcast(MODEACCEPTMESSAGE(client, channel->getName(), "-l", "" + argument), NULL, _server);
 		_server->log("Applying mode L: Removing limit", RED);
 		channel->setClientLimit(0);
 	}
@@ -179,7 +179,7 @@ void	ModeHandler::applyModeI(Client *client, Channel *channel, bool adding)
 	isAlreadySet = channel->isInviteOnly() == adding;
 	if (!isAlreadySet)
 	{
-		_server->sendToClient(client->getFd(), MODEACCEPTMESSAGE(client, channel->getName(), modeChange, ""));
+		channel->broadcast(MODEACCEPTMESSAGE(client, channel->getName(), modeChange, ""), NULL, _server);
 		_server->log("Applying mode I: " + std::string(adding ? "Setting invite-only" : "Removing invite-only"), GREEN);
 		channel->setInviteOnly(adding);
 	}
@@ -210,7 +210,7 @@ void	ModeHandler::applyModeK(Client *client, Channel *channel, bool adding, cons
 			_server->log("Invalid key for mode +k: contains spaces", RED);
 			return;
 		}
-		_server->sendToClient(client->getFd(), MODEACCEPTMESSAGE(client, channel->getName(), "+k ", argument));
+		channel->broadcast( MODEACCEPTMESSAGE(client, channel->getName(), "+k ", argument), NULL, _server);
 		_server->log("Applying mode K: Setting key to " + argument, GREEN);
 		channel->setKey(argument);
 	}

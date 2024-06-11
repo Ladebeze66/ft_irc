@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 19:51:08 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/01 18:51:10 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/11 13:50:53 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 #include "Server.hpp"
 #include "Channel.hpp"
 #include "Client.hpp"
+#include "AdditionalCommands.hpp"
 
 #include <map>
 #include <vector>

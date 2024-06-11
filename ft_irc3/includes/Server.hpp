@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:15:13 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/06 18:51:31 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/11 13:33:28 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,7 @@ class Server
 		ModeHandler *_modeHandler;
 		TopicHandler *_topicHandler;
 		BotFilter *_botFilter;
+		AdditionalCommands *_additionalCommands;
 
 		friend class ClientManager;
 		friend class CommandHandler;

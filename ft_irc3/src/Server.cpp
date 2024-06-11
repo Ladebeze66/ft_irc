@@ -6,14 +6,14 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:17:12 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/06 18:44:57 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/11 13:34:13 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 
 Server::Server(int port, const std::string &password)
-	: _port(port), _password(password), _clientManager(new ClientManager(this)), _commandHandler(new CommandHandler(this)), _modeHandler(new ModeHandler(this)), _topicHandler(new TopicHandler(this)), _botFilter(new BotFilter(this))
+	: _port(port), _password(password), _clientManager(new ClientManager(this)), _commandHandler(new CommandHandler(this)), _modeHandler(new ModeHandler(this)), _topicHandler(new TopicHandler(this)), _botFilter(new BotFilter(this)), _additionalCommands(new AdditionalCommands(this))
 {
 	initServer();
 	_botFilter = new BotFilter(this);

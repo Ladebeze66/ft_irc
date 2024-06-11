@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 18:09:05 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/10 13:28:55 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/11 13:30:49 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 #include "TopicHandler.hpp"
 #include "KickHandler.hpp"
 #include "BotFilter.hpp"
+#include "Join.hpp"
 
 #include <sstream>
 #include <string>
