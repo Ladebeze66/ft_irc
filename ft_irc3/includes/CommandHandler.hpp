@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 18:14:12 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/01 18:47:51 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/12 11:38:19 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@
 #include "Join.hpp"
 #include "Welcome.hpp"
 #include "ModeHandler.hpp"
+#include "Join.hpp"
+#include "Welcome.hpp"
 
 #include <string>
 #include <sstream>
@@ -34,6 +36,8 @@ class Channel;
 class WhoHandler;
 class AdditionalCommands;
 class ModeHandler;
+class JoinHandler;
+class WelcomeHandler;
 
 class CommandHandler
 {
@@ -41,10 +45,12 @@ private:
 	Server *_server;
 	AdditionalCommands *_additionalCommands;
 	ModeHandler *_modeHandler;
-
+	JoinHandler *_joinHandler;
+	WelcomeHandler *_welcomeHandler;
 
 public:
 	CommandHandler(Server *server);
+	~CommandHandler();
 	bool isValidNickname(const std::string& nickname);
 	bool isNicknameInUse(const std::string& nickname);
 	void handleNick(Client* client, const std::vector<std::string>& tokens);

@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/06 11:45:43 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/10 14:56:40 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/12 11:02:19 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@ void BotFilter::loadBadWords(const std::string &fileName)
 		_badWords.push_back(line);
 	}
 }
+
+BotFilter::~BotFilter() {}
 
 bool BotFilter::checkMessage(Client* client, Channel* channel, const std::string& message)
 {

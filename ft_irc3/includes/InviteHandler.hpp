@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/30 13:01:50 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/01 18:51:00 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/12 11:05:09 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ class InviteHandler
 {
 	public:
 		InviteHandler(Server* server);
+		~InviteHandler();
 		void handleInviteCommand(Client* client, const std::string& command);
 
 	private:

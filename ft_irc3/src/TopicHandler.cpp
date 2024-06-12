@@ -6,13 +6,15 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/30 17:04:58 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/08 19:17:37 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/12 11:12:14 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "TopicHandler.hpp"
 
 TopicHandler::TopicHandler(Server* server) : _server(server) {}
+
+TopicHandler::~TopicHandler() {}
 
 void TopicHandler::handleTopicCommand(Client* client, const std::string& command)
 {

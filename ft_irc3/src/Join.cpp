@@ -12,6 +12,11 @@
 
 #include "Join.hpp"
 
+JoinHandler::JoinHandler(Server *server) : _server(server)
+{}
+
+JoinHandler::~JoinHandler() {}
+
 void JoinHandler::handleJoinCommand(Client* client, const std::string& params, Server* server)
 {
 	std::map<std::string, Channel*>& channels = server->getChannels();
@@ -66,7 +71,46 @@ void JoinHandler::handleJoinCommand(Client* client, const std::string& params, S
 					it->second->broadcast(partMsg.str(), client, server);
 				}
 			}
-			// Leave all channels
+
+			//////////////////////////
+
+
+
+			/*std::vector<std::string> channels = split(channelNames, ",");
+			std::map<std::string, Channel *> &channelMap = server->getChannels();
+
+			for (size_t i = 0; i < channels.size(); ++i)
+			{
+				std::string &channelName = channels[i];
+				if (channelMap.find(channelName) == channelMap.end())
+				{
+					server->sendToClient(client->getFd(), ERR_NOSUCHCHANNEL(client, channelName));
+					continue;
+				}
+
+				Channel *channel = channelMap[channelName];
+				if (!channel->hasClient(client)) {
+					server->sendToClient(client->getFd(), ERR_NOTONCHANNEL(client, channelName));
+					continue;
+				}
+
+				channel->removeClient(client);
+
+				std::ostringstream partMsg;
+				partMsg << ":" << client->getNickname() << " PART " << channelName << " Leaving" << "\r\n";
+				server->sendToClient(client->getFd(), partMsg.str());
+
+				channel->broadcast(partMsg.str(), client, server);
+
+				if (channel->isEmpty())
+				{
+					delete channel;
+					channelMap.erase(channelName);
+				}
+
+				server->log("Client " + client->getNickname() + " left channel " + channelName, MAGENTA);
+			}
+			// Leave all channels*/
 			return;
 		}
 

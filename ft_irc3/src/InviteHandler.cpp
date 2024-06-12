@@ -6,13 +6,15 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/30 13:02:09 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/08 19:15:29 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/12 11:05:29 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "InviteHandler.hpp"
 
 InviteHandler::InviteHandler(Server* server) : _server(server) {}
+
+InviteHandler::~InviteHandler() {}
 
 void InviteHandler::handleInviteCommand(Client* client, const std::string& command)
 {

@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/16 15:27:29 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/11 11:45:43 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/12 11:01:35 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,9 @@ std::string toUpperCase(const std::string &str)
 	std::transform(upperStr.begin(), upperStr.end(), upperStr.begin(), ::toupper);
 	return upperStr;
 }
+
+AdditionalCommands::~AdditionalCommands()
+{}
 
 void AdditionalCommands::processCommand(Client *client, const std::string &command)
 {

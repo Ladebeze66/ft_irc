@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/30 17:04:33 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/01 19:02:10 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/12 11:11:49 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ class TopicHandler
 {
 	public:
 		TopicHandler(Server* server);
+		~TopicHandler();
 		void handleTopicCommand(Client* client, const std::string& command);
 
 	private:

@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/01 17:00:31 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/08 19:16:10 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/12 11:40:37 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 
 
 KickHandler::KickHandler(Server* server) : _server(server) {}
+
+KickHandler::~KickHandler() {}
 
 void KickHandler::handleKickCommand(Client* client, const std::string& command)
 {

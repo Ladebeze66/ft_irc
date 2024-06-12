@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/06 11:44:44 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/10 14:46:42 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/12 11:02:00 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ class BotFilter
 {
 public:
 	BotFilter(Server* server);
+	~BotFilter();
 	void loadBadWords(const std::string& fileName);
 	bool checkMessage(Client* client, Channel* channel, const std::string& message);
 	void warnClient(Client* client, Channel* channel);

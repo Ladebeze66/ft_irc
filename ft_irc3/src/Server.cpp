@@ -6,26 +6,34 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:17:12 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/11 13:34:13 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/12 12:45:22 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 
+Server *Server::instance = NULL;
+
 Server::Server(int port, const std::string &password)
-	: _port(port), _password(password), _clientManager(new ClientManager(this)), _commandHandler(new CommandHandler(this)), _modeHandler(new ModeHandler(this)), _topicHandler(new TopicHandler(this)), _botFilter(new BotFilter(this)), _additionalCommands(new AdditionalCommands(this))
+	: _port(port), _password(password), _clientManager(new ClientManager(this)), _commandHandler(new CommandHandler(this)), _modeHandler(new ModeHandler(this)), _topicHandler(new TopicHandler(this)), _botFilter(new BotFilter(this)), _additionalCommands(new AdditionalCommands(this)),  _joinHandler(new JoinHandler(this)), _welcomeHandler(new WelcomeHandler(this))
 {
 	initServer();
-	_botFilter = new BotFilter(this);
 	_botFilter->loadBadWords("badwords.txt");
+	bool_exit = 0;
+	instance = this;  // Stocke l'instance actuelle
+	signal(SIGINT, Server::signalHandler);  // Enregistre le gestionnaire de signal
 }
 
 Server::~Server()
 {
 	delete _clientManager;
+	delete _welcomeHandler;
+	delete _joinHandler;
 	delete _commandHandler;
 	delete _topicHandler;
 	delete _botFilter;
+	delete _modeHandler;
+	delete _additionalCommands;
 
 	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
@@ -78,6 +86,15 @@ void Server::initServer()
 	log("Server initialized.", GREEN);
 }
 
+void Server::signalHandler(int signum)
+{
+	if (signum == SIGINT)
+	{
+		instance->bool_exit = 1;  // Définit bool_exit à 1 lorsque Ctrl-C est capturé
+		std::cout << RED << "SIGINT detected" << RESET << std::endl;
+	}
+}
+
 void Server::run()
 {
 	struct pollfd server_pollfd;
@@ -86,22 +103,24 @@ void Server::run()
 	server_pollfd.revents = 0;
 	_poll_fds.push_back(server_pollfd);
 
-
 	struct pollfd stdin_pollfd;
 	stdin_pollfd.fd = STDIN_FILENO;
 	stdin_pollfd.events = POLLIN;
 	stdin_pollfd.revents = 0;
 	_poll_fds.push_back(stdin_pollfd);
 
-	while (true)
+	bool running = true;
+
+	while (running)
 	{
+		if (bool_exit == 1)
+			return;
 		int poll_count = poll(&_poll_fds[0], _poll_fds.size(), -1);
 		if (poll_count == -1)
 		{
 			log("Poll error.", RED);
-			exit(EXIT_FAILURE);
+			return; // Vous pouvez remplacer par une gestion d'erreur plus propre
 		}
-
 		for (size_t i = 0; i < _poll_fds.size(); ++i)
 		{
 			if (_poll_fds[i].revents & POLLIN)
@@ -119,9 +138,10 @@ void Server::run()
 					_clientManager->handleClient(_poll_fds[i].fd);
 				}
 			}
-		}
+		}	
 	}
 }
+
 
 
 std::map<std::string, Channel *> &Server::getChannels()
@@ -141,8 +161,9 @@ void Server::handleServerCommands()
 
 	if (command == "quit")
 	{
-		log("Server shutting down.", YELLOW);
-		exit(EXIT_SUCCESS);
+		bool_exit = 1;
+		//log("Server shutting down.", YELLOW);
+		//exit(EXIT_SUCCESS);
 	}
 	else if (command == "channels")
 	{

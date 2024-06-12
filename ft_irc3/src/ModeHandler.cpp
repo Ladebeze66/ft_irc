@@ -6,13 +6,15 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/30 11:13:08 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/11 11:27:28 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/12 11:11:16 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ModeHandler.hpp"
 
 ModeHandler::ModeHandler(Server* server) : _server(server) {}
+
+ModeHandler::~ModeHandler() {}
 
 void ModeHandler::handleModeCommand(Client* client, const std::string& command)
 {

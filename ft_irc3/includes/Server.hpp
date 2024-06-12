@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:15:13 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/11 13:33:28 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/12 12:58:02 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@
 #include "ModeHandler.hpp"
 #include "TopicHandler.hpp"
 #include "BotFilter.hpp"
+#include "Join.hpp"
+#include "Welcome.hpp"
 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -36,6 +38,8 @@
 #include <vector>
 #include <map>
 #include <poll.h>
+#include <csignal>
+
 
 class Client;
 class Channel;
@@ -45,6 +49,8 @@ class AdditionalCommands;
 class ModeHandler;
 class TopicHandler;
 class BotFilter;
+class JoinHandler;
+class WelcomeHandler;
 
 class Server
 {
@@ -79,6 +85,10 @@ class Server
 		TopicHandler *_topicHandler;
 		BotFilter *_botFilter;
 		AdditionalCommands *_additionalCommands;
+		JoinHandler *_joinHandler;
+		WelcomeHandler *_welcomeHandler;
+		static Server *instance;
+		static void signalHandler(int signum);
 
 		friend class ClientManager;
 		friend class CommandHandler;
@@ -88,6 +98,7 @@ class Server
 	private:
 		void initServer();
 		void handleServerCommands();
+		bool bool_exit;
 };
 
 #endif

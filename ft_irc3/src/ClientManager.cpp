@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 18:32:23 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/06 19:59:09 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/12 13:04:16 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,11 @@ ClientManager::ClientManager(Server *server)
 {
 	_botFilter = new BotFilter(server);
 	_botFilter->loadBadWords("badwords.txt");
+}
+
+ClientManager::~ClientManager()
+{
+	delete _botFilter;
 }
 
 void ClientManager::acceptClient()
@@ -33,6 +38,7 @@ void ClientManager::acceptClient()
 	struct pollfd client_pollfd;
 	client_pollfd.fd = client_fd;
 	client_pollfd.events = POLLIN;
+	client_pollfd.revents = 0;
 	_server->_poll_fds.push_back(client_pollfd);
 
 	std::stringstream ss;
@@ -42,60 +48,60 @@ void ClientManager::acceptClient()
 
 void ClientManager::handleClient(int client_fd)
 {
-    Client* client = _server->getClients()[client_fd];
-    std::memset(client->buffer, 0, sizeof(client->buffer));
-    int bytes_received = recv(client_fd, client->buffer, sizeof(client->buffer), 0);
+	Client* client = _server->getClients()[client_fd];
+	std::memset(client->buffer, 0, sizeof(client->buffer));
+	int bytes_received = recv(client_fd, client->buffer, sizeof(client->buffer), 0);
 
-    if (bytes_received <= 0)
-    {
-        std::ostringstream oss;
-        oss << "Client disconnected: " << client_fd;
-        _server->log(oss.str(), RED);
-        removeClient(client_fd);
-        return;
-    }
+	if (bytes_received <= 0)
+	{
+		std::ostringstream oss;
+		oss << "Client disconnected: " << client_fd;
+		_server->log(oss.str(), RED);
+		removeClient(client_fd);
+		return;
+	}
 
-    std::cout << std::string(client->buffer).size() << " client->buffer " << std::string(client->buffer).find('\n') << std::endl;
+	std::cout << std::string(client->buffer).size() << " client->buffer " << std::string(client->buffer).find('\n') << std::endl;
 
-    for (size_t i = 0; client->buffer[i]; i++)
-    {
-        std::cout << client->buffer[i] << " .. ";
-    }
-    std::cout << std::endl;
+	for (size_t i = 0; client->buffer[i]; i++)
+	{
+		std::cout << client->buffer[i] << " .. ";
+	}
+	std::cout << std::endl;
 
-    if (std::string(client->buffer).find('\n') != std::string::npos)
-    {
-        strcat(client->buffer2, client->buffer);
+	if (std::string(client->buffer).find('\n') != std::string::npos)
+	{
+		strcat(client->buffer2, client->buffer);
 
-        bool messageAllowed = true;
-        std::set<std::string>::const_iterator it;
-        for (it = client->getChannels().begin(); it != client->getChannels().end(); ++it)
-        {
-            const std::string& channelName = *it;
-            Channel* channel = _server->getChannelByName(channelName);
-            if (channel && !_botFilter->checkMessage(client, channel, std::string(client->buffer2)))
-            {
-                messageAllowed = false;
-                break;
-            }
-        }
+		bool messageAllowed = true;
+		std::set<std::string>::const_iterator it;
+		for (it = client->getChannels().begin(); it != client->getChannels().end(); ++it)
+		{
+			const std::string& channelName = *it;
+			Channel* channel = _server->getChannelByName(channelName);
+			if (channel && !_botFilter->checkMessage(client, channel, std::string(client->buffer2)))
+			{
+				messageAllowed = false;
+				break;
+			}
+		}
 
-        if (messageAllowed)
-        {
-            handleClientNext(client_fd, client->buffer2, std::string(client->buffer2).size());
-        }
+		if (messageAllowed)
+		{
+			handleClientNext(client_fd, client->buffer2, std::string(client->buffer2).size());
+		}
 
-        std::memset(client->buffer2, 0, std::string(client->buffer2).size());
-    }
-    else
-    {
-        strcat(client->buffer2, client->buffer);
-        for (size_t i = 0; client->buffer2[i]; i++)
-        {
-            std::cout << client->buffer2[i] << " . ";
-        }
-    }
-    std::cout << std::endl;
+		std::memset(client->buffer2, 0, std::string(client->buffer2).size());
+	}
+	else
+	{
+		strcat(client->buffer2, client->buffer);
+		for (size_t i = 0; client->buffer2[i]; i++)
+		{
+			std::cout << client->buffer2[i] << " . ";
+		}
+	}
+	std::cout << std::endl;
 }
 
 void ClientManager::handleClientNext(int client_fd, char * buffer, int bytes_received)

@@ -6,14 +6,14 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 18:26:34 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/08 19:14:48 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/12 12:15:47 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CommandHandler.hpp"
 
 CommandHandler::CommandHandler(Server *server)
-	: _server(server), _additionalCommands(new AdditionalCommands(server)), _modeHandler(new ModeHandler(server))
+	: _server(server), _additionalCommands(new AdditionalCommands(server)), _modeHandler(new ModeHandler(server)), _joinHandler(new JoinHandler(server)), _welcomeHandler(new WelcomeHandler(server))
 	{
 		// Ensure that _server is not null
 		if (!_server)
@@ -22,6 +22,14 @@ CommandHandler::CommandHandler(Server *server)
 			exit(EXIT_FAILURE);
 		}
 	}
+
+CommandHandler::~CommandHandler()
+{
+	delete _welcomeHandler;
+	delete _joinHandler;
+	delete _modeHandler;
+	delete _additionalCommands;
+}
 
 void CommandHandler::handleCommand(Client* client, const std::string& command)
 {
@@ -71,8 +79,7 @@ void CommandHandler::handleCommand(Client* client, const std::string& command)
 	else if (commandType == "JOIN")
 	{
 		std::string joinParams = command.substr(command.find(" ") + 1);
-		JoinHandler joinHandler;
-		joinHandler.handleJoinCommand(client, joinParams, _server);
+		_joinHandler->handleJoinCommand(client, joinParams, _server);
 	}
 	else
 	{
@@ -248,8 +255,7 @@ void CommandHandler::handleUser(Client* client, const std::vector<std::string>& 
 	if (client->getPassword() == _server->_password && !client->getNickname().empty())
 	{
 		client->authenticate();
-		WelcomeHandler welcomeHandler;
-		welcomeHandler.sendWelcomeMessages(client, _server);
+		_welcomeHandler->sendWelcomeMessages(client, _server);
 		_server->log("Client " + client->getNickname() + " authenticated.", GREEN);
 	}
 	else

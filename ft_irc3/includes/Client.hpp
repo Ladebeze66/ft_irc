@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:15:42 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/06 19:59:39 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/12 12:58:08 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,13 @@
 
 #include <string>
 #include <set>
+#include <cstring> 
 
 class Client
 {
 public:
 	Client(int fd, const std::string &nickname, const std::string &user, const std::string &host, const std::string &password, const std::string &realname);
+	~Client();
 
 	int getFd() const;
 	const std::string &getNickname() const;

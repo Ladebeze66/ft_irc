@@ -6,14 +6,21 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/15 12:17:42 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/06 20:06:29 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/12 12:51:56 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
 
 Client::Client(int fd, const std::string &nickname, const std::string &user, const std::string &host, const std::string &password, const std::string &realname)
-	: _fd(fd), _nickname(nickname), _user(user), _host(host), _password(password), _realname(realname), _authenticated(false), _operator(false), _away(false) {}
+	: _fd(fd), _nickname(nickname), _user(user), _host(host), _password(password), _realname(realname), _authenticated(false), _operator(false), _away(false)
+{
+	std::memset(buffer, 0, sizeof(buffer));
+	std::memset(buffer2, 0, sizeof(buffer2));
+}
+
+Client::~Client()
+{}
 
 int Client::getFd() const
 {

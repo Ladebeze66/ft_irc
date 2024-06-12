@@ -6,11 +6,15 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 17:53:52 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/05/30 16:43:14 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/12 11:14:28 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Welcome.hpp"
+
+WelcomeHandler::WelcomeHandler(Server *server) : _server(server) {}
+
+WelcomeHandler::~WelcomeHandler() {}
 
 void WelcomeHandler::sendWelcomeMessages(Client *client, Server *server)
 {

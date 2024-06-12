@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/17 16:09:20 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/07 13:43:54 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/12 11:15:09 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@ WhoHandler::WhoHandler(Server *server)
 	: _server(server)
 {
 }
+
+WhoHandler::~WhoHandler() {}
 
 void WhoHandler::handleWhoCommand(Client *client, const std::string &command)
 {

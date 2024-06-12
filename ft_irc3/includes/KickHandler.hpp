@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/01 16:59:42 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/01 18:51:26 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/12 11:10:14 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ class KickHandler
 {
 	public:
 		KickHandler(Server* server);
+		~KickHandler();
 		void handleKickCommand(Client* client, const std::string& command);
 
 	private:

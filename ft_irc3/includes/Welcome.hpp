@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 19:53:17 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/01 19:02:40 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/12 11:13:27 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,13 @@
 class WelcomeHandler
 {
 	public:
+		WelcomeHandler(Server *server);
+		~WelcomeHandler();
 		void sendWelcomeMessages(Client *client, Server *server);
 		void sendMotd(Client *client, Server *server);
+
+	private:
+		Server *_server;
 };
 
 #endif

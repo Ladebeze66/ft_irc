@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 18:09:05 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/11 13:30:49 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/12 11:39:51 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ class Server;
 class Client;
 class Channel;
 class BotFilter;
+class KickHandler;
 class AdditionalCommands
 {
 	private:
@@ -41,6 +42,7 @@ class AdditionalCommands
 
 	public:
 		AdditionalCommands(Server *server);
+		~AdditionalCommands();
 		void processCommand(Client *client, const std::string &command);
 		void broadcastChannelList(Client *client, Server *server);
 		void handlePartCommand(Server *server, Client *client, const std::string &command);

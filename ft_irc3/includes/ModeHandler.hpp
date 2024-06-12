@@ -6,7 +6,7 @@
 /*   By: fgras-ca <fgras-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/30 11:12:57 by fgras-ca          #+#    #+#             */
-/*   Updated: 2024/06/08 18:53:15 by fgras-ca         ###   ########.fr       */
+/*   Updated: 2024/06/12 11:10:55 by fgras-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ class ModeHandler
 {
 	public:
 		ModeHandler(Server* server);
+		~ModeHandler();
 		void handleModeCommand(Client* client, const std::string& command);
 
 	private:
